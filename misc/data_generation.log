@@ -1,0 +1,166 @@
+2024-05-15 16:01:22 CEST - ERROR - HTTPSConnectionPool(host='gimg3.fbeads.us', port=443): Max retries exceeded with url: /20180820/1326/1534746011816140_1326.jpg (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1006)')))
+2024-05-15 16:01:24 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7cb32c560cc0>
+2024-05-15 16:01:24 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:26 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:26 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:26 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:27 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:27 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:27 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:28 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:29 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:29 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:29 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:29 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:29 CEST - ERROR - No image was found at: https://www.compel.nl/media/catalog/product/cache/1/small_image/270x270/9df78eab33525d08d6e5fb8d27136e95/i/m/image_d2611e4711417e293cf9f94062c167a2_1498016788.jpg
+2024-05-15 16:01:30 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:30 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:30 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:01:30 CEST - ERROR - HTTPSConnectionPool(host='prod-ecom-media.soundstrue.com', port=443): Max retries exceeded with url: /media/catalog/product/cache/1/small_image/210x/9df78eab33525d08d6e5fb8d27136e95/1/0/1052.jpg (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1006)')))
+2024-05-15 16:01:31 CEST - ERROR - HTTPSConnectionPool(host='www.silverblings.com', port=443): Max retries exceeded with url: /1990-home_default/14k-white-gold-8x6-mm-double-stone-engagement-garnet-peridot-ring-w-0-07-carat-brilliant-cut-diamonds-2-34-carats-oval.jpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7cb2d816b5d0>, 'Connection to www.silverblings.com timed out. (connect timeout=1)'))
+2024-05-15 16:01:31 CEST - ERROR - Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
+2024-05-15 16:54:43 CEST - ERROR - No image was found at: http://agoeu.com/media/catalog/product/cache/1/small_image/170x/9df78eab33525d08d6e5fb8d27136e95/s/3/s3rv_lmp7p2vo_hdmzcuy5t.png
+2024-05-15 16:54:45 CEST - ERROR - No image was found at: https://www.oakhurstinteriors.co.uk/image/cache/catalog/Larder%20Units/54957301P1-300x300.jpg
+2024-05-15 16:54:49 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7405a0d80180>
+2024-05-15 16:54:50 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7405a0d81ad0>
+2024-05-15 16:54:53 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7405980f76f0>
+2024-05-15 16:55:06 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRRBYEDNBCPO.JPG?width=220&amp;height=220&ccid=x1b219bbb
+2024-05-15 16:55:15 CEST - ERROR - No image was found at: https://i2.wp.com/ot-magazine.co.uk/wp-content/uploads/2017/07/Drive-Devilbiss-CMYK-Vertical.jpg?resize=1280%2C640&amp;ssl=1
+2024-05-15 16:55:16 CEST - ERROR - HTTPSConnectionPool(host='autourdesspectacles.org', port=443): Max retries exceeded with url: /wp-content/uploads/2019/01/photo-atelier-danse-astorgis-14-01-19.jpg?w=800 (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x740598418e90>: Failed to resolve 'autourdesspectacles.org' ([Errno -2] Name or service not known)"))
+2024-05-15 16:58:49 CEST - ERROR - No image was found at: http://agoeu.com/media/catalog/product/cache/1/small_image/170x/9df78eab33525d08d6e5fb8d27136e95/s/3/s3rv_lmp7p2vo_hdmzcuy5t.png
+2024-05-15 16:58:50 CEST - ERROR - No image was found at: https://www.oakhurstinteriors.co.uk/image/cache/catalog/Larder%20Units/54957301P1-300x300.jpg
+2024-05-15 16:58:54 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec155c6c450>
+2024-05-15 16:58:55 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec155c6d3f0>
+2024-05-15 16:58:57 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec1541ec950>
+2024-05-15 16:59:05 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRRBYEDNBCPO.JPG?width=220&amp;height=220&ccid=x1b219bbb
+2024-05-15 16:59:14 CEST - ERROR - No image was found at: https://i2.wp.com/ot-magazine.co.uk/wp-content/uploads/2017/07/Drive-Devilbiss-CMYK-Vertical.jpg?resize=1280%2C640&amp;ssl=1
+2024-05-15 16:59:15 CEST - ERROR - HTTPSConnectionPool(host='autourdesspectacles.org', port=443): Max retries exceeded with url: /wp-content/uploads/2019/01/photo-atelier-danse-astorgis-14-01-19.jpg?w=800 (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7ec14c7f1f90>: Failed to resolve 'autourdesspectacles.org' ([Errno -2] Name or service not known)"))
+2024-05-15 16:59:18 CEST - ERROR - HTTPSConnectionPool(host='gimg3.fbeads.us', port=443): Max retries exceeded with url: /20180820/1326/1534746011816140_1326.jpg (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1006)')))
+2024-05-15 16:59:20 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec1541a7d30>
+2024-05-15 16:59:23 CEST - ERROR - No image was found at: https://www.compel.nl/media/catalog/product/cache/1/small_image/270x270/9df78eab33525d08d6e5fb8d27136e95/i/m/image_d2611e4711417e293cf9f94062c167a2_1498016788.jpg
+2024-05-15 16:59:23 CEST - ERROR - HTTPSConnectionPool(host='prod-ecom-media.soundstrue.com', port=443): Max retries exceeded with url: /media/catalog/product/cache/1/small_image/210x/9df78eab33525d08d6e5fb8d27136e95/1/0/1052.jpg (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1006)')))
+2024-05-15 16:59:29 CEST - ERROR - No image was found at: https://infinityonloop.com/wp-content/uploads/2019/02/image-result-for-showbox-300x200.png
+2024-05-15 16:59:31 CEST - ERROR - HTTPSConnectionPool(host='blogs.matrix.prod.uk.lxnx.squiz.co.uk', port=443): Max retries exceeded with url: /de-blog/bilder/thumbnails/whitepaper-monitoring-news-coverage.png (Caused by SSLError(SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'blogs.matrix.prod.uk.lxnx.squiz.co.uk'. (_ssl.c:1006)")))
+2024-05-15 16:59:31 CEST - ERROR - No image was found at: https://randomoyun.com/storage/images/October2018/2acae8be44a70913481e66dd2cd3f761.jpg
+2024-05-15 16:59:31 CEST - ERROR - HTTPConnectionPool(host='images3.uread.com', port=80): Max retries exceeded with url: /productimages/mainimages/775/9781594774775.jpg (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x7ec14c7eb990>: Failed to resolve 'images3.uread.com' ([Errno -2] Name or service not known)"))
+2024-05-15 16:59:32 CEST - ERROR - No image was found at: https://www.realgorillaseeds.com/files/2018/08/gypsy-nirvana-324x324.jpg
+2024-05-15 16:59:32 CEST - ERROR - HTTPSConnectionPool(host='kamellazaarfoundation.org', port=443): Max retries exceeded with url: /sites/default/files/styles/inner_large/public/fb-clock-extrait_note.jpg?itok=8SCcqAuR (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1006)')))
+2024-05-15 16:59:52 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRFLMRYKKGHY.PNG?width=173&amp;height=173&ccid=x785e753
+2024-05-15 17:00:12 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRAMEXNKQYLO.JPG?width=173&amp;height=173&ccid=x3f0347fa
+2024-05-15 17:00:12 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c641ee0>
+2024-05-15 17:00:15 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c79c090>
+2024-05-15 17:00:17 CEST - ERROR - No image was found at: https://i.imgur.com/DCZEeD3.jpg
+2024-05-15 17:00:18 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c7539c0>
+2024-05-15 17:00:20 CEST - ERROR - HTTPSConnectionPool(host='www.indesignlive.sg', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:00:23 CEST - ERROR - No image was found at: https://cdn.babymarkt.com/babymarkt/img/596120/443/tomy-my-fairy-garden-mini-feen-topf-joy-a236233.jpg
+2024-05-15 17:00:25 CEST - ERROR - No image was found at: https://ubloom.com/wp-content/uploads/2013/07/IMG_2501.jpg
+2024-05-15 17:00:27 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRBTSCBPABCM.JPG?width=300&amp;height=300&ccid=x2a902c5f
+2024-05-15 17:00:28 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c690270>
+2024-05-15 17:00:44 CEST - ERROR - HTTPSConnectionPool(host='starckman-cdn2.bbstore.fr', port=443): Max retries exceeded with url: /2250-special_starckman/pack-35-couches-pampers-baby-dry.jpg (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7ec14c6113d0>: Failed to resolve 'starckman-cdn2.bbstore.fr' ([Errno -3] Temporary failure in name resolution)"))
+2024-05-15 17:00:46 CEST - ERROR - No image was found at: http://img.youtube.com/vi/9kScPXeVR-c/hqdefault.jpg
+2024-05-15 17:00:54 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c6f0450>
+2024-05-15 17:00:57 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/MELGTXCMXKHG.JPG?width=220&amp;height=220&ccid=x1949656c
+2024-05-15 17:01:00 CEST - ERROR - HTTPSConnectionPool(host='myfreshperspective.com', port=443): Max retries exceeded with url: /wp-content/uploads/2015/08/A-peek-inside-the-30-day-Eat-Spin-Run-Repeat-Smoothie-Challenge.jpg (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7ec14c604f10>: Failed to resolve 'myfreshperspective.com' ([Errno -3] Temporary failure in name resolution)"))
+2024-05-15 17:01:01 CEST - ERROR - HTTPSConnectionPool(host='render.fineartamerica.com', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:01:02 CEST - ERROR - HTTPSConnectionPool(host='i2.wp.com', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:01:04 CEST - ERROR - No image was found at: https://4c0aa8c22572fea1c25b-dcb2c52d171c68965595a3f761d319ba.ssl.cf3.rackcdn.com/pink-casino/game-images/ted-pub-fruit-series/ted-pub-fruit-banner-medium.jpg?v=7.1.1
+2024-05-15 17:01:06 CEST - ERROR - No image was found at: https://media.singlemalt.pl/media/catalog/product/cache/5/image/400x500/9bbf795454cacd58ab1291d6720452e3/a/u/auchentoshan_virgin-b_1.jpg
+2024-05-15 17:01:07 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/MEADUVSOOMYJ.JPG?width=220&amp;height=220&ccid=x1949656c
+2024-05-15 17:01:08 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c622b10>
+2024-05-15 17:01:09 CEST - ERROR - No image was found at: https://cdn.xxl.thumbs.canstockphoto.com/robot-cartoon-illustration-for-coloring-black-and-white-cartoon-illustration-of-happy-robot-or-droid-eps-vector_csp15489981.jpg
+2024-05-15 17:01:12 CEST - ERROR - No image was found at: https://cdn10.bigcommerce.com/s-cz2g0sipvf/products/70067/images/511545/51mAD0DeAhL._AA500___01926.1476490708.190.285.jpg?c=2
+2024-05-15 17:01:16 CEST - ERROR - HTTPSConnectionPool(host='thepoolhouse.co.nz', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:01:19 CEST - ERROR - HTTPSConnectionPool(host='www.universum.ro', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:01:19 CEST - ERROR - No image was found at: https://cdn10.bigcommerce.com/s-cz2g0sipvf/products/152749/images/4093924/51Fp4Yh0N%25252BL._AA500___06233.1529591846.190.285.jpg?c=2
+2024-05-15 17:01:20 CEST - ERROR - HTTPSConnectionPool(host='pics.dmm.co.jp', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:01:21 CEST - ERROR - HTTPSConnectionPool(host='img.cliparto.com', port=443): Max retries exceeded with url: /pic/s/183756/3143512-ring-of-fire.jpg (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)')))
+2024-05-15 17:01:23 CEST - ERROR - HTTPSConnectionPool(host='stat-a01.alsen.pl', port=443): Max retries exceeded with url: /media/cache/gallery/product/2/364/496/512/kfrpnglg/images/25/25914/f976acb90a2cf24db553b6df6b125226_1.jpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7ec14c4fd010>, 'Connection to stat-a01.alsen.pl timed out. (connect timeout=1)'))
+2024-05-15 17:01:24 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c6762f0>
+2024-05-15 17:01:25 CEST - ERROR - HTTPSConnectionPool(host='i13.onbuy.com', port=443): Max retries exceeded with url: /product/cf500f6d906743739c5eb5f62b93ee54-m8275080.jpg (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1006)')))
+2024-05-15 17:01:26 CEST - ERROR - No image was found at: https://www.laminaatallin.nl/media/wysiwyg/Laminaat_All-in_showroom_zwolle.jpg
+2024-05-15 17:01:37 CEST - ERROR - No image was found at: https://www.kpoptown.com/9594-home_default/shinee-4th-mini-album-sherlock-cd-poster.jpg
+2024-05-15 17:01:39 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FREBRGURPFJU.JPG?width=220&amp;height=220&ccid=x7f7cc601
+2024-05-15 17:01:46 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRHAIGKRYSKP.JPG?width=500&amp;height=500&ccid=x4d053a89
+2024-05-15 17:01:47 CEST - ERROR - HTTPSConnectionPool(host='www.reggaedub.org', port=443): Max retries exceeded with url: /3755-home_default/Dubkasm__Iration_Steppas_-_CM4400_EP_-_12_-_Dubkasm_Records.jpg (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1006)')))
+2024-05-15 17:01:48 CEST - ERROR - No image was found at: https://img.staticbg.com/thumb/view/oaupload/banggood/images/FD/D5/26a340ba-db2e-4db1-a0e5-8cc3b4a392c6.jpg
+2024-05-15 17:01:50 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRHJDWPOTHDI.JPG?width=500&amp;height=500&ccid=x171932af
+2024-05-15 17:01:50 CEST - ERROR - No image was found at: https://i0.wp.com/www.brownspoint.com/store/pc/suzuki/images/dt25c_30c/01/fig015.jpg
+2024-05-15 17:01:51 CEST - ERROR - No image was found at: https://img.youtube.com/vi/lfFd5bxszNM/hqdefault.jpg
+2024-05-15 17:01:54 CEST - ERROR - No image was found at: https://photo-resize-zmp3.zadn.vn/w240h135_jpeg/thumb_video/2/d/6/5/2d659261b4b423b9aa54db5670d8a87b.jpg
+2024-05-15 17:02:00 CEST - ERROR - No image was found at: https://minds-in-bloom.com/wp-content/uploads/2015/12/Thinking-Deep-with-Inferencing-300x300.png
+2024-05-15 17:02:00 CEST - ERROR - HTTPSConnectionPool(host='www.wholesalejerseyschinapro.com', port=443): Max retries exceeded with url: /wp-content/uploads/2017/04/Womens-2017-MLB-Chicago-Cubs-3-Ross-Blue-Jerseys.jpg (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7ec14c576e10>: Failed to resolve 'www.wholesalejerseyschinapro.com' ([Errno -2] Name or service not known)"))
+2024-05-15 17:02:01 CEST - ERROR - No image was found at: https://cdn.xxl.thumbs.canstockphoto.com/shelves-with-products-vector-grey-vector-shelves-with-products-clipart-vector_csp38602558.jpg
+2024-05-15 17:02:02 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRHLALGRTBWJ.JPG?width=220&amp;height=220&ccid=x440d1b92
+2024-05-15 17:02:03 CEST - ERROR - HTTPSConnectionPool(host='images.collection.cooperhewitt.org', port=443): Max retries exceeded with url: /115701_3ff75a96ad40b642_b.jpg (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)')))
+2024-05-15 17:02:05 CEST - ERROR - No image was found at: https://d3fvvvsv2jlapp.cloudfront.net/data/media/images/catalogue/KK7434%20BLACK%20FRONT.jpg?height=225&amp;width=150&amp;404=default.jpg
+2024-05-15 17:02:06 CEST - ERROR - No image was found at: https://cdn.xxl.thumbs.canstockphoto.com/banking-word-made-by-leter-pieces-stock-image_csp8133186.jpg
+2024-05-15 17:02:06 CEST - ERROR - No image was found at: https://cdn3.volusion.com/hrqpw.cruld/v/vspfiles/photos/AAF-CG4A-2T.jpg?1547554872
+2024-05-15 17:02:07 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRSKMOWXEDUK.JPG?width=173&amp;height=173&ccid=x66bf2510
+2024-05-15 17:02:08 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/MEVHLYMYHIJK.JPG?width=220&amp;height=220&ccid=x440d1b92
+2024-05-15 17:02:08 CEST - ERROR - No image was found at: https://www.premierholidays.co.uk/__data/assets/image/0003/530877/Explore_Banff.jpg
+2024-05-15 17:02:09 CEST - ERROR - No image was found at: https://cdn.xxl.thumbs.canstockphoto.com/market-timing-stopwatch-and-stock-charts-stock-image_csp0086696.jpg
+2024-05-15 17:02:12 CEST - ERROR - HTTPSConnectionPool(host='cdn.123movies.sc', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:02:14 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c530810>
+2024-05-15 17:02:16 CEST - ERROR - HTTPConnectionPool(host='img.waimaoniu.net', port=80): Max retries exceeded with url: /156/201707251441138218.jpg (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x7ec14c5a5590>: Failed to resolve 'img.waimaoniu.net' ([Errno -2] Name or service not known)"))
+2024-05-15 17:02:18 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRWYWBAAGFVK.JPG?width=220&amp;height=220&ccid=x3288565f
+2024-05-15 17:02:23 CEST - ERROR - No image was found at: http://images.thisisxbox.com/2014/02/Titanfall_wallpaper2560x1440-370x207.jpg
+2024-05-15 17:02:35 CEST - ERROR - No image was found at: https://www.sandingshed.co.uk/wp-content/uploads/2014/08/high0154-270x270.jpg
+2024-05-15 17:02:36 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRHUFUHFJMMP.JPG?width=500&amp;height=500&ccid=x5009d048
+2024-05-15 17:02:37 CEST - ERROR - No image was found at: https://cdn.xxl.thumbs.canstockphoto.com/wedding-invitation-border-red-roses-image-and-illustration-composition-3-dimensional-ornamental-clipart_csp3057951.jpg
+2024-05-15 17:02:38 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c5ac220>
+2024-05-15 17:02:39 CEST - ERROR - No image was found at: https://dominileather.com/wp-content/uploads/2018/09/Womens-Authentic-Vintage-Tote-Bag-Venice-350x350.jpg
+2024-05-15 17:02:40 CEST - ERROR - No image was found at: https://signalrex.com/store/2431-home_default/krolok-when-the-moon-sang-our-songs-digipak-cd.jpg
+2024-05-15 17:02:42 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRVRTOMNDBHD.JPG?width=220&amp;height=220&ccid=x3ed50e95
+2024-05-15 17:02:42 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRWUNWMABHCY.JPG?width=500&amp;height=500&ccid=x4d3dbf55
+2024-05-15 17:02:43 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c58dbc0>
+2024-05-15 17:02:45 CEST - ERROR - HTTPSConnectionPool(host='binaryoptionstrading-review.com', port=443): Max retries exceeded with url: /wp-content/uploads/2014/10/Boss-Capital-Trading-Platform-Call-Put.jpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7ec12d704e90>, 'Connection to binaryoptionstrading-review.com timed out. (connect timeout=1)'))
+2024-05-15 17:02:49 CEST - ERROR - HTTPSConnectionPool(host='img.agentaccount.com', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:02:49 CEST - ERROR - No image was found at: https://i.ytimg.com/vi/ifQ9p4phcy0/maxresdefault.jpg
+2024-05-15 17:02:51 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c5ebec0>
+2024-05-15 17:02:55 CEST - ERROR - No image was found at: http://inxo-bizlive-enterprise-rep.s3.amazonaws.com/15753-qMSNIi98wO/ema_report_emc_partners_with_vmware_on_vxrail_hyper-converged_offering.pdf_thumb_rect_large320x180.jpg
+2024-05-15 17:03:02 CEST - ERROR - No image was found at: https://cdn.xxl.thumbs.canstockphoto.com/woman-having-fun-riding-bicycle-at-the-beach-carefree-woman-having-fun-enjoying-summer-riding-pictures_csp17430083.jpg
+2024-05-15 17:03:03 CEST - ERROR - No image was found at: https://cdn.xxl.thumbs.canstockphoto.com/portrait-of-romantic-pretty-couple-on-fitness-session-outside-town-background-portrait-of-a-young-stock-image_csp40910061.jpg
+2024-05-15 17:03:03 CEST - ERROR - No image was found at: https://www.eschuhe.de/media/catalog/product/cache/image/650x650//0/0/0000200494234_04_ab.jpg
+2024-05-15 17:03:11 CEST - ERROR - No image was found at: https://img.staticbg.com/thumb/view/oaupload/banggood/images/A4/61/52bb3fa1-ac38-4bcb-bc03-ad275bc4ed49.jpg
+2024-05-15 17:03:14 CEST - ERROR - HTTPSConnectionPool(host='newhomefurniture.co.za', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:03:14 CEST - ERROR - HTTPSConnectionPool(host='enterprisemarketer-cdn1.azureedge.net', port=443): Max retries exceeded with url: /media/183398/header.jpg?anchor=center&amp;mode=crop&amp;width=840&amp;height=480&amp;v=5 (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7ec12d7626d0>: Failed to resolve 'enterprisemarketer-cdn1.azureedge.net' ([Errno -2] Name or service not known)"))
+2024-05-15 17:03:15 CEST - ERROR - HTTPConnectionPool(host='design-companies.liaa.gov.lv', port=80): Max retries exceeded with url: /sites/exim/themes/exim/magnetic.png (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x7ec12d760850>: Failed to resolve 'design-companies.liaa.gov.lv' ([Errno -2] Name or service not known)"))
+2024-05-15 17:03:16 CEST - ERROR - HTTPSConnectionPool(host='assetscdn1.paytm.com', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:03:17 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec12d744f40>
+2024-05-15 17:03:22 CEST - ERROR - No image was found at: http://i.ytimg.com/vi/A1rSu1iy7kg/mqdefault.jpg
+2024-05-15 17:03:23 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec14c5e9e40>
+2024-05-15 17:03:25 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRYMVCYIJSJL.PNG?width=220&amp;height=220&ccid=x440d1b92
+2024-05-15 17:03:28 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRTBSFYVBEDW.JPG?width=220&amp;height=220&ccid=x171932af
+2024-05-15 17:03:37 CEST - ERROR - No image was found at: http://images.gtcarlot.com/gtgallery/7819391-640.jpg
+2024-05-15 17:03:37 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec12d744900>
+2024-05-15 17:03:48 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec12d7a5c60>
+2024-05-15 17:03:49 CEST - ERROR - No image was found at: https://ke.jumia.is/VIZ_9l6kDC8-wnoKPv1oAIgeKDc=/fit-in/220x220/filters:fill(white):sharpen(1,0,false):quality(100)/product/07/50513/1.jpg?8435
+2024-05-15 17:04:00 CEST - ERROR - No image was found at: https://img.staticbg.com/thumb/view/oaupload/banggood/images/D0/58/6af345c9-2096-4b16-a49d-17083d783726.JPG
+2024-05-15 17:04:01 CEST - ERROR - No image was found at: https://cdn2.bigcommerce.com/n-pktq5q/v7bssafn/products/615/images/2878/DSC_5086-Edit__45343.1544893394.220.290.jpg?c=2
+2024-05-15 17:04:04 CEST - ERROR - No image was found at: http://www.eartagcentral.com/images/T/840%20Med%20Yellow%20-%20Web.jpg
+2024-05-15 17:04:06 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRHQAMVJUYOK.JPG?width=300&amp;height=300&ccid=x4d3dbf55
+2024-05-15 17:04:12 CEST - ERROR - No image was found at: https://www.mochni.com/wp-content/uploads/2017/07/sandqvist-backpack-1024x758.jpg
+2024-05-15 17:04:17 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRYHKCXFGXXP.JPG?width=500&amp;height=500&ccid=x4d053a89
+2024-05-15 17:04:21 CEST - ERROR - No image was found at: http://t0.gstatic.com/images?q=tbn:ANd9GcTaHUGL2om5d-xka0X6lZnCMBe1xEUdobr1DMx2ud3x4ADhDyML
+2024-05-15 17:04:22 CEST - ERROR - No image was found at: https://www.specsserver.com/CACHE/FRPQJKNOLGQB.JPG?width=250&amp;height=250&ccid=x54294ae4
+2024-05-15 17:04:22 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec12d636020>
+2024-05-15 17:04:22 CEST - ERROR - No image was found at: https://media.gettyimages.com/photos/ewa-lipska-bronislaw-maj-urszula-koziol-and-other-guests-attend-the-picture-id618274106?s=612x612
+2024-05-15 17:04:31 CEST - ERROR - Exceeded 30 redirects.
+2024-05-15 17:04:37 CEST - ERROR - HTTPSConnectionPool(host='www.ala.org', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:04:38 CEST - ERROR - cannot identify image file <_io.BytesIO object at 0x7ec12d637f10>
+2024-05-15 17:04:38 CEST - ERROR - No image was found at: https://media.gettyimages.com/photos/nick-knight-edward-enninful-and-charlotte-knight-attends-a-dinner-by-picture-id871400616?s=612x612
+2024-05-15 17:04:39 CEST - ERROR - HTTPConnectionPool(host='t0.gstatic.com', port=80): Read timed out. (read timeout=1)
+2024-05-15 17:05:09 CEST - ERROR - No image was found at: http://cdn3.bigcommerce.com/s-cz2g0sipvf/products/81035/images/1291324/511FxIeUvqL._AA500___84877.1481467517.190.285.jpg?c=2
+2024-05-15 17:05:17 CEST - ERROR - No image was found at: http://img.spintoband.com/nimg/9c/3f/7c65b9a513c719c48bab30215b9f-300x300-0/children_big_gunner_shooting_big_gunner_kids_game_machines_arcade_machine.jpg
+2024-05-15 17:05:22 CEST - ERROR - No image was found at: https://www.art3d.com/uploads/p1/A16021P96-1-peel-and-stick-stainless-steel-backsplash-tiles_2611160603.jpg
+2024-05-15 17:05:24 CEST - ERROR - No image was found at: http://www.diag-avignon.fr/img/p/5/2/3/3/5233-home_default.jpg
+2024-05-15 17:05:24 CEST - ERROR - HTTPConnectionPool(host='media.diffitalia.it', port=80): Max retries exceeded with url: /prodotti/1/556/s.jpg (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x7ec12c4ecd10>: Failed to resolve 'media.diffitalia.it' ([Errno -2] Name or service not known)"))
+2024-05-15 17:05:25 CEST - ERROR - No image was found at: https://kbimages1-a.akamaihd.net/c3b2d891-c948-4bb9-8b06-f908097d25d4/140/215/60/False/the-alhambra-38.jpg
+2024-05-15 17:05:29 CEST - ERROR - HTTPConnectionPool(host='t0.gstatic.com', port=80): Read timed out. (read timeout=1)
+2024-05-15 17:05:35 CEST - ERROR - No image was found at: https://theframe-gallery.co.uk/wp-content/uploads/2017/10/Hare-Brained.jpg
+2024-05-15 17:05:37 CEST - ERROR - HTTPSConnectionPool(host='afit.co', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:05:44 CEST - ERROR - HTTPConnectionPool(host='cdncf-au.fluidretail.net', port=80): Max retries exceeded with url: /customers/c1467/52/70/-1/01/98/5/generated/5270-101985_NA_01_330x430.jpg (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x7ec12c500cd0>: Failed to resolve 'cdncf-au.fluidretail.net' ([Errno -5] No address associated with hostname)"))
+2024-05-15 17:05:47 CEST - ERROR - No image was found at: https://cdn3.volusion.com/36qtp.bg42e/v/vspfiles/photos/GO-725-GRPE-GG-1.jpg?1420030802
+2024-05-15 17:05:49 CEST - ERROR - No image was found at: https://www.geeky-gadgets.com/wp-content/uploads/2009/08/Super-Mario-World-Rubiks-Cube_1.jpg
+2024-05-15 17:05:57 CEST - ERROR - HTTPSConnectionPool(host='media-cdn.tripadvisor.com', port=443): Read timed out. (read timeout=1)
+2024-05-15 17:05:57 CEST - ERROR - No image was found at: http://images.citysearch.net/assets/imgdb/merchant/2015/9/1/0/zZjBOWSh10.jpeg
