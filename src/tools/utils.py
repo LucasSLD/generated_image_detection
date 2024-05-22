@@ -39,6 +39,9 @@ def plot_tensor(tensor, title : str = None, colorbar=False,figsize=None):
         return
     plot_np_array(array, title, colorbar, figsize)
 
+def plot_pil_img(img, title: str = None, figsize = None):
+    plot_np_array(np.asarray(img),title=title,figsize=figsize)
+    plt.show()
 
 def img_from_url(url: str):
     """Returns a PIL image from a given url
@@ -158,36 +161,39 @@ def load_data_split(dataset_path: str,
     y_split = ds["label"]
     return X_split, y_split
 
-def load_train_test(dataset_path: str,
-                    model: CLIP,
-                    preprocess: torchvision.transforms.transforms.Compose,
-                    device: str,
-                    normalize: bool = False,
-                    show_progress_bar: bool = False):
-    """Loads train and test data
+def load_data_features(dataset_path: str,
+                       split: str):
+    """Load a split from a dataset containing 
 
     Args:
         dataset_path (str): path to the dataset
-        model (CLIP): CLIP pretrained model
-        preprocess (torchvision.transforms.transforms.Compose): preprocess function obtained with open_clip.create_model_and_transforms method
-        device (str): "cpu" or "cuda"
-        normalize (bool): when set to True, normalize the features. Default to False
-        show_progress_bar (bool): when True, plot progress bar
+        split (str): the split to load
 
     Returns:
-        _type_: X_train (n_train, n_features), X_test (n_test, n_features), y_train (n_train,), y_test (n_test,)
+        _type_: (n_samples,n_features) feature matrix and (n_samples,) label vector
     """
-    X_train, y_train = load_data_split(dataset_path,"train",model,preprocess,device,normalize, show_progress_bar)
-    X_test, y_test   = load_data_split(dataset_path,"test",model,preprocess,device,normalize, show_progress_bar)
-    return X_train, X_test, y_train, y_test
+    if split not in ("train", "test"):
+        print("split argument must be equal to 'train' or 'test")
+        exit
+    if not dataset_path.endswith("/"):
+        dataset_path += "/"
+
+    ds = load_from_disk(dataset_path=dataset_path+split).with_format("numpy")
+    if "features" not in ds.column_names:
+        print("The dataset should contain a 'features' field")
+        exit
+    X_split = ds["features"]
+    X_split = np.array([x.flatten() for x in X_split])
+    y_split = ds["label"]
+    return X_split, y_split
 
 def get_accuracy_clip_svc(train_dataset_path: str,
-                 test_dataset_path: str,
-                 model: CLIP,
-                 preprocess: torchvision.transforms.transforms.Compose,
-                 device: str,
-                 normalize: bool = False,
-                 show_progress_bar: bool = False):
+                          test_dataset_path: str,
+                          model: CLIP,
+                          preprocess: torchvision.transforms.transforms.Compose,
+                          device: str,
+                          normalize: bool = False,
+                          show_progress_bar: bool = False):
     """Compute the accuracy of a SVM classifier on a given test set
 
     Args:
@@ -235,3 +241,15 @@ def get_histograms(img: Image.Image, mode: str):
     img = img.convert(mode)
     c1, c2, c3 = img.split()
     return c1.histogram(), c2.histogram(), c3.histogram()
+
+def remove_directory(path: str):
+    """Delete a directory and all its files
+
+    Args:
+        path (str): path to the directory
+    """
+    if os.path.exists(path):
+        files = os.listdir(path)
+        for file in files:
+            os.remove(path + file)
+        os.rmdir(path)

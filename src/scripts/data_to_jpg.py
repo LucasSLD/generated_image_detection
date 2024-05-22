@@ -2,10 +2,15 @@ from datasets import load_from_disk, Dataset, DatasetInfo
 from copy import deepcopy
 import sys
 sys.path.append("../tools")
-from utils import convert_to_jpg
+from utils import convert_to_jpg, remove_directory
 import argparse
 from tqdm import tqdm
 import os
+
+"""
+This script is used to convert dataset withan "image" field that contains PIL images to jpg images.
+"""
+
 
 seed = 7
 img_directory = "./_dump/"
@@ -38,8 +43,5 @@ info = DatasetInfo(
 data = Dataset.from_dict(ds_jpg,info=info).train_test_split(test_size=.5,shuffle=True,seed=seed)
 data.save_to_disk(args.output + "_QF_" + str(args.quality))
 
-
-files = os.listdir(img_directory)
-for file in files:
-    os.remove(img_directory + file)
-os.rmdir(img_directory)
+# cleaning
+remove_directory(img_directory)
