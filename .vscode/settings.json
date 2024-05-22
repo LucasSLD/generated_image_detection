@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
         "./src/tools"
-    ]
+    ],
+    "nvidia-smi-plus.refresh.autoRefresh": true
 }
