@@ -253,3 +253,77 @@ def remove_directory(path: str):
         for file in files:
             os.remove(path + file)
         os.rmdir(path)
+
+def map_synthbuster_classes(example):
+    """Maps generator names to integers
+
+    Args:
+        example (_type_): a row from the dataset
+
+    Returns:
+        _type_: the sam row with the generator names replaced by integers
+    """
+    labels = ['null',
+              'glide',
+              'stable-diffusion-1-4',
+              'midjourney-v5',
+              'stable-diffusion-xl',
+              'dalle3',
+              'firefly',
+              'stable-diffusion-2',
+              'stable-diffusion-1-3',
+              'dalle2']
+    mapping = {key: i for i, key in enumerate(labels)}
+    example["generator"] = mapping[example["generator"]]
+    return example
+
+def label_conversion(e):
+    e["label"] = 1 if e["label"] == "real" else 0
+    return e
+
+def load_synthbuster_balanced(dataset_path: str, binary_classification: bool=True):
+    """Remove some images that are generated to have a balanced dataset
+
+    Args:
+        dataset_path (str): path to synthbuster
+        binary_classification (bool): when True 50% images are real and 50% are fake. When False, uniform distribution of images across every classes (9 generator class and the real class)
+    Returns:
+        _type_: balanced synthbuster dataset
+    """
+    sb = load_from_disk(dataset_path)
+    sb_real = sb.filter(lambda e: e["label"] == "real")
+    idx = set()
+    if binary_classification:
+        n_delete = 9000 - sb_real.num_rows # 9000 is the number of generated images in synthbuster
+        del_per_gen = n_delete//9 # number of images to delete per generator
+        gen = [e for e in sb.unique("generator") if e != "null"]
+        del_count = {key: 0 for key in gen}
+        for i, e in enumerate(sb):
+            if e["generator"] in gen and del_count[e["generator"]] < del_per_gen:
+                idx.add(i)
+                del_count[e["generator"]] += 1
+
+            quota_reached = True
+            for key in gen:
+                if del_count[key] < del_per_gen:
+                    quota_reached = False
+                    break
+            if quota_reached:
+                break
+        idx_select = set(range(sb.num_rows)) - idx
+    else: # multi-class setting
+        n_delete = sb_real.num_rows - 1000
+        del_count = 0
+        for i, e in enumerate(sb):
+            if e["generator"] == "null":
+                idx.add(i)
+                del_count += 1
+            if del_count == n_delete:
+                break
+        idx_select = set(range(sb.num_rows)) - idx
+    
+    sb = sb.select(idx_select)
+    sb = sb.map(label_conversion) if binary_classification else sb.map(map_synthbuster_classes)
+    X_sb = np.squeeze(np.array(sb["features"]))
+    y_sb = sb["label"] if binary_classification else sb["generator"]
+    return X_sb, y_sb

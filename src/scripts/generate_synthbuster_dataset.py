@@ -57,7 +57,7 @@ with zipfile.ZipFile("../../data/synthbuster/synthbuster.zip",mode="r") as zf:
 
 # Adding the real images
 data = load_from_disk("../../data/big_QF_" + str(args.quality))["test"].filter(lambda e : e["label"] == 1) # loading real images
-i = 0
+
 with tqdm(total=data.num_rows,desc="Real images processing...") as bar:
     for i, e in enumerate(data):
         d["generator"].append("null")
