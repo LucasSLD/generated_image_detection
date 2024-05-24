@@ -12,6 +12,7 @@ from datasets import load_from_disk
 from sklearn.svm import LinearSVC
 from tqdm import tqdm
 
+
 to_tensor = transforms.ToTensor()
 
 def plot_np_array(img_numpy_array, title : str = None, colorbar=False,figsize=None):
@@ -281,19 +282,22 @@ def label_conversion(e):
     e["label"] = 1 if e["label"] == "real" else 0
     return e
 
-def load_synthbuster_balanced(dataset_path: str, binary_classification: bool=True):
+def load_synthbuster_balanced(dataset_path: str,
+                              binary_classification: bool=True,
+                              balance_real_fake: bool=True):
     """Remove some images that are generated to have a balanced dataset
 
     Args:
         dataset_path (str): path to synthbuster
-        binary_classification (bool): when True 50% images are real and 50% are fake. When False, uniform distribution of images across every classes (9 generator class and the real class)
+        binary_classification (bool): 2 classes when True, 10 classes when False
+        balance_real_fake (bool): 50% real images/50% fake images when True. Else 1000 image per generator (real images come from teh 'null' generator)
     Returns:
         _type_: balanced synthbuster dataset
     """
     sb = load_from_disk(dataset_path)
     sb_real = sb.filter(lambda e: e["label"] == "real")
     idx = set()
-    if binary_classification:
+    if binary_classification or balance_real_fake:
         n_delete = 9000 - sb_real.num_rows # 9000 is the number of generated images in synthbuster
         del_per_gen = n_delete//9 # number of images to delete per generator
         gen = [e for e in sb.unique("generator") if e != "null"]
@@ -311,7 +315,7 @@ def load_synthbuster_balanced(dataset_path: str, binary_classification: bool=Tru
             if quota_reached:
                 break
         idx_select = set(range(sb.num_rows)) - idx
-    else: # multi-class setting
+    else:
         n_delete = sb_real.num_rows - 1000
         del_count = 0
         for i, e in enumerate(sb):
