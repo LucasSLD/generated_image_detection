@@ -233,7 +233,7 @@ def get_histograms(img: Image.Image, mode: str):
 
     Args:
         img (Image.Image): PIL image
-        mode (str): "RGB" or "HSV"
+        mode (str): "RGB" or "HSV" or "YCbCr"
 
     Returns:
         _type_: (1st channel histogram, 2nd channel histogram, 3rd channel histogram)
@@ -290,7 +290,7 @@ def load_synthbuster_balanced(dataset_path: str,
     Args:
         dataset_path (str): path to synthbuster
         binary_classification (bool): 2 classes when True, 10 classes when False
-        balance_real_fake (bool): 50% real images/50% fake images when True. Else 1000 image per generator (real images come from teh 'null' generator)
+        balance_real_fake (bool): 50% real images/50% fake images when True. Else 1000 images per generator (real images come from the 'null' generator)
     Returns:
         _type_: balanced synthbuster dataset
     """
@@ -328,6 +328,6 @@ def load_synthbuster_balanced(dataset_path: str,
     
     sb = sb.select(idx_select)
     sb = sb.map(label_conversion) if binary_classification else sb.map(map_synthbuster_classes)
-    X_sb = np.squeeze(np.array(sb["features"]))
+    X_sb = np.array(sb["features"])
     y_sb = sb["label"] if binary_classification else sb["generator"]
     return X_sb, y_sb

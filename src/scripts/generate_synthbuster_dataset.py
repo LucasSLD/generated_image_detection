@@ -50,7 +50,7 @@ with zipfile.ZipFile("../../data/synthbuster/synthbuster.zip",mode="r") as zf:
                             img_jpg,
                             model,
                             preprocess,
-                            device))
+                            device).flatten())
                     i += 1
                     bar.n = i
                     bar.refresh()
@@ -67,7 +67,7 @@ with tqdm(total=data.num_rows,desc="Real images processing...") as bar:
                 e["image"],
                 model,
                 preprocess,
-                device))
+                device).flatten())
         bar.n = i
         bar.refresh()
 
