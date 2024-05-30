@@ -1,5 +1,4 @@
 import numpy as np
-from math import log
 import matplotlib.pyplot as plt
 from torchvision import transforms
 import requests
@@ -11,6 +10,9 @@ import os
 from datasets import load_from_disk
 from sklearn.svm import LinearSVC
 from tqdm import tqdm
+import sys
+sys.path.append(".")
+from constants import REAL_LABEL, FAKE_LABEL
 
 
 to_tensor = transforms.ToTensor()
@@ -181,8 +183,7 @@ def load_data_features(dataset_path: str,
 
     ds = load_from_disk(dataset_path=dataset_path+split).with_format("numpy")
     if "features" not in ds.column_names:
-        print("The dataset should contain a 'features' field")
-        exit
+        raise Exception("The dataset should contain a 'feature' field")
     X_split = ds["features"]
     X_split = np.array([x.flatten() for x in X_split])
     y_split = ds["label"]
@@ -279,7 +280,7 @@ def map_synthbuster_classes(example):
     return example
 
 def label_conversion(e):
-    e["label"] = 1 if e["label"] == "real" else 0
+    e["label"] = REAL_LABEL if e["label"] == "real" else FAKE_LABEL
     return e
 
 def load_synthbuster_balanced(dataset_path: str,
