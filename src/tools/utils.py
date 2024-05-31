@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import torch.utils
+import torch.utils.data
 from torchvision import transforms
 import requests
 from PIL import Image

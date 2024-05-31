@@ -32,7 +32,10 @@ class DeepFakeDataset(Dataset):
                  path_to_data: str,
                  img_per_gen: int,
                  balance_real_fake: bool,
-                 device: str = device):
+                 device: str = device,
+                 use_color_features: bool = False,
+                 mode: str = "HSV",
+                 n_bins: str = 64):
         if not path_to_data.endswith("/"): path_to_data += "/"
         model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
         model.eval()
@@ -49,6 +52,9 @@ class DeepFakeDataset(Dataset):
         self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL} 
         self.n_fake = len(generators) * img_per_gen
         self.n_real = self.n_fake if balance_real_fake else img_per_gen
+        # Normalization attributes
+        self.features_min = 0.
+        self.features_max = 0.
         
         #================= Real images processing =================================================================================#
         k = 0
@@ -56,20 +62,38 @@ class DeepFakeDataset(Dataset):
         self.gen_to_int[REAL_IMG_GEN] = k
         jpg_files = os.listdir(path_to_data + "Flickr2048")
         imgs = []
-        
+
+        if use_color_features: 
+            color_features = torch.empty((0,n_bins))
+            def extract_color_features(img: Image.Image, mode: str, n_bins: int):
+                assert mode in ("HSV","YCbCr")
+                converted_img   = np.asarray(img.convert(mode))
+                S_Cb = converted_img[:,:,1]
+                V_Cr = converted_img[:,:,2]
+                hist_S_Cb, _ = np.histogram(S_Cb,bins=n_bins)
+                hist_V_Cr, _ = np.histogram(V_Cr,bins=n_bins)
+                return hist_S_Cb, hist_V_Cr
+
         for i, file in enumerate(tqdm(jpg_files,total=self.n_real,desc="Processing images from Flickr2048")):
             if i >= self.n_real:
                 break
-            imgs.append(self.transform(Image.open(path_to_data + REAL_FOLDER_NAME + "/" + file)).unsqueeze(0).to(device))
+            img = Image.open(path_to_data + REAL_FOLDER_NAME + "/" + file)
+            imgs.append(self.transform(img).unsqueeze(0).to(device))
             self.label.append(REAL_LABEL)
             self.gen.append(k)
             
+            # CLIP features
             if len(imgs) == CUDA_MEMORY_LIMIT: # avoiding CUDA OutOfMeMory Error
                 with torch.no_grad():
                     features = model.encode_image(torch.cat(imgs,dim=0))
                 self.features = torch.cat((self.features,features.cpu()),dim=0)
                 imgs = []
                 torch.cuda.empty_cache()
+
+            # Color features
+            if use_color_features:
+                hist_S_Cb, hist_V_Cr = extract_color_features(img=img,mode=mode,n_bins=n_bins)
+                color_features = torch.cat((color_features,torch.Tensor(np.hstack(hist_S_Cb,hist_V_Cr))),dim=0)
         
         if imgs: # not empty
             with torch.no_grad(): # extracting the features from the last images
@@ -88,14 +112,30 @@ class DeepFakeDataset(Dataset):
             for i, file in enumerate(tqdm(png_files,f"Processing images from {gen}",total=min(len(png_files),img_per_gen))):
                 if i >= img_per_gen:
                     break
-                imgs.append(self.transform(Image.open(path_to_data + gen + "/" + file)).unsqueeze(0).to(device))
+                img = Image.open(path_to_data + gen + "/" + file)
+                imgs.append(self.transform(img).unsqueeze(0).to(device))
                 self.label.append(FAKE_LABEL)
                 self.gen.append(k)
             
+            # CLIP features    
             with torch.no_grad():
                 features = model.encode_image(torch.cat(imgs,dim=0))
             self.features = torch.cat((self.features,features.cpu()),dim=0)
             torch.cuda.empty_cache()
+
+            # Color features
+            if use_color_features:
+                hist_S_Cb, hist_V_Cr = extract_color_features(img=img,mode=mode,n_bins=n_bins)
+                color_features = torch.cat((color_features,torch.Tensor(np.hstack(hist_S_Cb,hist_V_Cr))),dim=0)
+
+        print(color_features.shape)
+        print(self.features.shape)
+        if use_color_features:
+            self.features = torch.cat((self.features,color_features),dim=1)
+        
+        self.features_min = torch.min(self.features,dim=0).values
+        self.features_max = torch.max(self.features,dim=0).values
+
 
     def __len__(self):
         return len(self.label)
