@@ -14,7 +14,7 @@ from sklearn.svm import LinearSVC
 from tqdm import tqdm
 import sys
 sys.path.append(".")
-from constants import REAL_LABEL, FAKE_LABEL
+from constants import REAL_LABEL, FAKE_LABEL, REAL_IMG_GEN
 
 
 to_tensor = transforms.ToTensor()
@@ -267,7 +267,7 @@ def map_synthbuster_classes(example):
     Returns:
         _type_: the sam row with the generator names replaced by integers
     """
-    labels = ['null',
+    labels = [REAL_IMG_GEN,
               'glide',
               'stable-diffusion-1-4',
               'midjourney-v5',
@@ -303,7 +303,7 @@ def load_synthbuster_balanced(dataset_path: str,
     if binary_classification or balance_real_fake:
         n_delete = 9000 - sb_real.num_rows # 9000 is the number of generated images in synthbuster
         del_per_gen = n_delete//9 # number of images to delete per generator
-        gen = [e for e in sb.unique("generator") if e != "null"]
+        gen = [e for e in sb.unique("generator") if e != REAL_IMG_GEN]
         del_count = {key: 0 for key in gen}
         for i, e in enumerate(sb):
             if e["generator"] in gen and del_count[e["generator"]] < del_per_gen:
@@ -322,7 +322,7 @@ def load_synthbuster_balanced(dataset_path: str,
         n_delete = sb_real.num_rows - 1000
         del_count = 0
         for i, e in enumerate(sb):
-            if e["generator"] == "null":
+            if e["generator"] == REAL_IMG_GEN:
                 idx.add(i)
                 del_count += 1
             if del_count == n_delete:
@@ -334,3 +334,21 @@ def load_synthbuster_balanced(dataset_path: str,
     X_sb = np.array(sb["features"])
     y_sb = sb["label"] if binary_classification else sb["generator"]
     return X_sb, y_sb
+
+def extract_color_features(img: Image.Image, mode: str, n_bins: int):
+                assert mode in ("HSV","YCbCr")
+                converted_img   = np.asarray(img.convert(mode))
+                S_Cb = converted_img[:,:,1]
+                V_Cr = converted_img[:,:,2]
+                hist_S_Cb, _ = np.histogram(S_Cb,bins=n_bins)
+                hist_V_Cr, _ = np.histogram(V_Cr,bins=n_bins)
+                return hist_S_Cb, hist_V_Cr
+
+def extract_generators_name_aid_test():
+    """Extract the name of the generator from directory's name for AID_TEST
+
+    Args:
+        path (str): path to /data3/AID_TEST
+    """
+    folders = os.listdir("/data3/AID_TEST")
+    

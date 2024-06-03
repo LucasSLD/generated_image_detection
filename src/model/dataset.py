@@ -2,7 +2,9 @@ import albumentations as A
 from torch.utils.data import Dataset, DataLoader
 import sys
 sys.path.append("../tools")
-from constants import CLIP_FEATURE_DIM, REAL_LABEL, FAKE_LABEL
+sys.path.append("../utils")
+from constants import CLIP_FEATURE_DIM, REAL_LABEL, FAKE_LABEL, DINO_FEATURE_DIM, REAL_IMG_GEN
+from utils import extract_color_features
 import open_clip
 import torch
 import os
@@ -23,7 +25,6 @@ transform_torch = A.Compose([
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-REAL_IMG_GEN = "null"
 REAL_FOLDER_NAME = "Flickr2048"
 CUDA_MEMORY_LIMIT = 1000
 
@@ -65,14 +66,6 @@ class DeepFakeDataset(Dataset):
 
         if use_color_features: 
             color_features = torch.empty((0,n_bins))
-            def extract_color_features(img: Image.Image, mode: str, n_bins: int):
-                assert mode in ("HSV","YCbCr")
-                converted_img   = np.asarray(img.convert(mode))
-                S_Cb = converted_img[:,:,1]
-                V_Cr = converted_img[:,:,2]
-                hist_S_Cb, _ = np.histogram(S_Cb,bins=n_bins)
-                hist_V_Cr, _ = np.histogram(V_Cr,bins=n_bins)
-                return hist_S_Cb, hist_V_Cr
 
         for i, file in enumerate(tqdm(jpg_files,total=self.n_real,desc="Processing images from Flickr2048")):
             if i >= self.n_real:
@@ -102,7 +95,7 @@ class DeepFakeDataset(Dataset):
         torch.cuda.empty_cache()
         
         #================= Fake images processing =================================================================================#
-        for gen in generators: # fake images
+        for gen in generators:
             k += 1
             self.int_to_gen[k] = gen
             self.gen_to_int[gen] = k
@@ -128,8 +121,6 @@ class DeepFakeDataset(Dataset):
                 hist_S_Cb, hist_V_Cr = extract_color_features(img=img,mode=mode,n_bins=n_bins)
                 color_features = torch.cat((color_features,torch.Tensor(np.hstack(hist_S_Cb,hist_V_Cr))),dim=0)
 
-        print(color_features.shape)
-        print(self.features.shape)
         if use_color_features:
             self.features = torch.cat((self.features,color_features),dim=1)
         
@@ -158,7 +149,7 @@ class DeepFakeDataset(Dataset):
             classes = classes.cpu().numpy()
         labels = torch.zeros(len(classes))
         for i, e in enumerate(classes):
-            labels[i] = FAKE_LABEL if self.int_to_gen[e] != "null" else REAL_LABEL
+            labels[i] = FAKE_LABEL if self.int_to_gen[e] != REAL_IMG_GEN else REAL_LABEL
         return labels
     
     def save(self,output_path: str):
@@ -172,11 +163,12 @@ class DeepFakeDataset(Dataset):
             "n_real": self.n_real,
             "n_fake": self.n_fake
         },output_path)
+
     
 class DeepFakeDatasetFastLoad(Dataset):
     """Class used to load DeepFakeDataset that has been serialized"""
-    def __init__(self,path: str) -> None:
-        data = torch.load(path,"cpu")
+    def __init__(self,path_to_data: str) -> None:
+        data = torch.load(path_to_data,"cpu")
         self.img_per_gen  = data["img_per_gen"]
         self.features     = data["features"]
         self.gen          = data["gen"]
@@ -211,3 +203,117 @@ class DeepFakeDatasetFastLoad(Dataset):
         for i, e in enumerate(classes):
             labels[i] = FAKE_LABEL if self.int_to_gen[e] != "null" else REAL_LABEL
         return labels
+    
+    
+class OOD(Dataset):
+    def __init__(self, path_to_data: str,
+                 load_preprocessed: bool,
+                 device: str=device):
+        
+        if not path_to_data.endswith("/"): path_to_data += "/"
+        
+        if load_preprocessed:
+            data = torch.load(path_to_data,"cpu")
+            self.features = data["features"]
+            self.label    = data["label"]
+            self.gen      = data["gen"]
+            self.gen_to_int = data["gen_to_int"] 
+            self.int_to_gen = data["int_to_gen"] 
+            self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"}
+            self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL}
+        else:
+            self.features = torch.empty((0,DINO_FEATURE_DIM))
+            self.label    = torch.empty((0)).int()
+            self.gen      = torch.empty((0)).int()
+            self.gen_to_int = {} 
+            self.int_to_gen = {}
+            self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
+            self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL}
+            self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+            
+            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            model.eval()
+            
+            REAL_IMG_PATH = path_to_data + "real_images/"
+            FAKE_IMG_PATH = path_to_data + "AI_images/"
+
+            real_files = os.listdir(REAL_IMG_PATH)
+            fake_files = os.listdir(FAKE_IMG_PATH)
+            
+            k = 0
+            #================================= Real images processing =================================#
+            self.int_to_gen[k] = REAL_IMG_GEN
+            self.gen_to_int[REAL_IMG_GEN] = k
+            real_imgs = [self.transform(Image.open(REAL_IMG_PATH + file)).unsqueeze(0).to(device) for file in tqdm(real_files,"Processing real images")]
+            with torch.no_grad():
+                features = model.encode_image(torch.cat(real_imgs,dim=0))
+            self.features = torch.cat((self.features,features.cpu()),dim=0)
+            self.label = torch.cat((self.label,torch.Tensor(len(real_imgs) * [REAL_LABEL])),dim=0)
+            self.gen = torch.cat((self.gen,torch.ones(len(real_imgs)) * k),dim=0)
+            torch.cuda.empty_cache()
+            #================================= Fake images processing =================================#
+            gen_folder = ['Lexica_images',
+                          'Ideogram_images',
+                          'Leonardo_images',
+                          'Copilot_images',
+                          'img2img_SD1.5_images',
+                          'Photoshop_images_generativemagnification',
+                          'Photoshop_images_generativefill']
+            
+            generators = ['Lexica',
+                          'Ideogram',
+                          'Leonardo',
+                          'Copilot',
+                          'img2img_SD1.5',
+                          'Photoshop_generativemagnification',
+                          'Photoshop_generativefill'] # clean names
+            
+            for i, gen in enumerate(gen_folder):
+                k += 1
+                self.int_to_gen[k] = generators[i]
+                self.gen_to_int[generators[i]] = k
+                fake_imgs = []
+                desc = f"Processing images from {generators[i]}"
+                
+                for file in tqdm(os.listdir(FAKE_IMG_PATH + gen),desc=desc):
+                    img = Image.open(FAKE_IMG_PATH + gen + "/" + file)
+                    fake_imgs.append(self.transform(img).unsqueeze(0).to(device))
+                with torch.no_grad():
+                    features = model.encode_image(torch.cat(fake_imgs,dim=0))
+                self.features = torch.cat((self.features,features.cpu()),dim=0)
+                self.label = torch.cat((self.label,torch.Tensor(len(fake_imgs) * [FAKE_LABEL])),dim=0)
+                self.gen = torch.cat((self.gen,torch.Tensor(len(fake_imgs) * [k])),dim=0)
+                torch.cuda.empty_cache()
+
+    def __len__(self):
+        return len(self.label)
+    
+    def __getitem__(self, index):
+        return {"label": self.label[index],
+                "features": self.features[index],
+                "generator": self.gen[index]}
+
+    def class_to_label(self, classes):
+        """Maps an array of integers representing classes to a list of 0 and 1 depending on whether the class represented a generated or a real image.
+
+        Args:
+            classes (_type_): array of classes taking values in DeepFakeDataset.int_to_gen.keys()
+
+        Returns:
+            _type_: array of 0 and 1 representing fake and real labels 
+        """
+        if isinstance(classes,torch.Tensor):
+            classes = classes.cpu().numpy()
+        labels = torch.zeros(len(classes))
+        for i, e in enumerate(classes):
+            labels[i] = FAKE_LABEL if self.int_to_gen[e] != REAL_IMG_GEN else REAL_LABEL
+        return labels
+
+    def save(self, output_path: str):
+        torch.save({
+            "features": self.features,
+            "label": self.label,
+            "gen": self.gen,
+            "int_to_gen": self.int_to_gen,
+            "gen_to_int": self.gen_to_int,
+        }, output_path)
