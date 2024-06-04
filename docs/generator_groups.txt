@@ -1,0 +1,116 @@
+Stable diffusion:
+    AID_TRAIN:
+        "stable-1-5-vRC",
+        "stable-2-1-vRC",
+        "stable-xl-vRC"
+    AID_TEST:
+        "Source_24_stable-1.5_512",
+        "Source_25_stable-1-5-vRC_512",
+        "Source_26_stable-2.1_512",
+        "Source_27_stable-2-1-vRC_512",
+        "Source_28_stable-xl_512",
+        "Source_29_stable-xl-vRC_512"
+Kandisky:
+    AID_TRAIN:
+        "Kandinsky-2.1-vRC",
+        "Kandinsky-2.2-vRC"
+    AID_TEST:
+        "Source_10_Kandinsky-2.2-vRC_512",
+        "Source_11_kandinsky_512",
+        "Source_9_Kandinsky-2.1-vRC_512"
+DF_XL:
+    AID_TRAIN:
+        "DF-XL-vRC"
+    AID_TEST:
+        "Source_3_DF-XL_512",
+        "Source_4_DF-XL-vRC_512"
+
+dreamlike:
+    AID_TRAIN:
+        "dreamlike-vRC"
+    AID_TEST:
+        "Source_5_dreamlike_512",
+        "Source_6_dreamlike-vRC_512"
+
+Real images:
+    AID_TRAIN:
+        "Flickr2048"
+    AID_TEST:
+        "Source_00_RealPhoto"
+
+gigaGAN:
+    AID_TRAIN:
+        "gigaGAN"
+    AID_TEST:
+        "Source_7_gigaGAN_512"
+
+GlideUP:
+    AID_TRAIN:
+        "GlideUP"
+    AID_TEST:
+        "Source_8_glideUP_512"
+
+LafitteUP:
+    AID_TRAIN:
+        "LafitteUP"
+    AID_TEST:
+        "Source_12_LafitteUP_512"
+
+LCM_Dreamshaper
+    AID_TRAIN:
+        "LCM_Dreamshaper-v7-vRC"
+    AID_TEST:
+        "Source_32_LCM_Dreamshaper-v7-vRC_512"
+
+megaDallEUP:
+    AID_TRAIN:
+        "megaDallEUP"
+    AID_TEST:
+        "Source_14_megaDallEUP_512"
+
+miniDallEUP:
+    AID_TRAIN:
+        "miniDallEUP"
+    AID_TEST:
+        "Source_15_miniDallEUP_512"
+
+pixart:
+    AID_TRAIN:
+        "pixartSigma-vRC"
+    AID_TEST:
+        "Source_16_pixart_512",
+        "Source_17_pixartAlpha-vRC_512",
+        "Source_18_pixartSigma-vRC_512"
+
+playground:
+    AID_TRAIN:
+        "playground-v2-5-vRC",
+        "playground-v2-vRC"
+    AID_TEST:
+        "Source_19_playground-v2_512",
+        "Source_20_playground-v2-5_512",
+        "Source_21_playground-v2-5-vRC_512",
+        "Source_22_playground-v2-vRC_512"
+
+styleGan2:
+    AID_TRAIN:
+        "styleGan2"
+    AID_TEST:
+        "Source_30_styleGAN2_512"
+    
+styleGan3:
+    AID_TRAIN:
+        "styleGan3"
+    AID_TEST:
+        "Source_31_styleGAN3_512"
+
+animagineXL:
+    AID_TRAIN:
+        "animagineXL3-1-vRC"
+    AID_TEST:
+        "Source_1_animagineXL3-1_512",
+        "Source_2_animagineXL3-1-vRC_512"
+
+AID_TEST unmatched:
+    Source_13_LDM_512
+    Source_23_ShiftedDiffusion_512

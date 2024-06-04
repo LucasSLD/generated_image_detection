@@ -28,14 +28,40 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 REAL_FOLDER_NAME = "Flickr2048"
 CUDA_MEMORY_LIMIT = 1000
 
+def gen2int(gen: str) -> int:
+    """Maps generator names to integers using intermediate mapping to a family of generators
+
+    Args:
+        gen (str): 
+
+    Returns:
+        int: integer value
+    """
+    for generator in GEN_TO_GEN:
+        if gen in GEN_TO_GEN[generator]:
+            return GEN_TO_INT[generator]
+    raise Exception(f"{gen} is not in GEN_TO_GEN map (see tools/constants.py)")
+
+def int2gen(i: int) -> str:
+    return INT_TO_GEN[i]
+
+def class2label(i: int):
+    """maps class to real or fake label
+
+    Args:
+        i (int): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    return REAL_LABEL if INT_TO_GEN[i] == REAL_IMG_GEN else 0 
+
 class DeepFakeDataset(Dataset):
     def __init__(self, 
                  path_to_data: str,
                  img_per_gen: int,
                  balance_real_fake: bool,
                  device: str = device,
-                 gen_to_int = GEN_TO_INT_DATA3,
-                 int_to_gen = INT_TO_GEN_DATA3,
                  use_color_features: bool = False,
                  mode: str = "HSV",
                  n_bins: str = 64):
@@ -49,8 +75,8 @@ class DeepFakeDataset(Dataset):
         self.features = torch.empty((0,CLIP_FEATURE_DIM))
         self.label = []
         self.gen = []
-        self.int_to_gen = gen_to_int
-        self.gen_to_int = int_to_gen
+        self.int_to_gen = INT_TO_GEN_DATA3
+        self.gen_to_int = GEN_TO_INT_DATA3
         self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
         self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL} 
         self.n_fake = len(generators) * img_per_gen
@@ -72,7 +98,7 @@ class DeepFakeDataset(Dataset):
             img = Image.open(path_to_data + REAL_FOLDER_NAME + "/" + file)
             imgs.append(self.transform(img).unsqueeze(0).to(device))
             self.label.append(REAL_LABEL)
-            self.gen.append(self.gen_to_int[REAL_IMG_GEN])
+            self.gen.append(gen2int(gen))
             
             # CLIP features
             if len(imgs) == CUDA_MEMORY_LIMIT: # avoiding CUDA OutOfMeMory Error
@@ -104,7 +130,7 @@ class DeepFakeDataset(Dataset):
                 img = Image.open(path_to_data + gen + "/" + file)
                 imgs.append(self.transform(img).unsqueeze(0).to(device))
                 self.label.append(FAKE_LABEL)
-                self.gen.append(self.gen_to_int[gen])
+                self.gen.append(gen2int(gen))
             
             # CLIP features    
             with torch.no_grad():
@@ -306,3 +332,23 @@ class OOD(Dataset):
             "int_to_gen": self.int_to_gen,
             "gen_to_int": self.gen_to_int,
         }, output_path)
+
+
+class DeepFakeTest(Dataset):
+    def __init__(self, 
+                 path_to_data: str,
+                 img_per_gen: int,
+                 balance_real_fake: bool,
+                 device: str = device):
+        
+        if not path_to_data.endswith("/"):
+            path_to_data += "/"
+
+        self.gen_to_int = GEN_TO_INT_DATA3_TEST
+        self.int_to_gen = INT_TO_GEN_DATA3_TEST
+        self.features = torch.empty((0,CLIP_FEATURE_DIM))
+        self.label = torch.empty(0).int()
+        self.gen   = torch.empty(0).int()
+
+        for gen in os.listdir(path_to_data):
+            
