@@ -3,7 +3,7 @@ from torch.utils.data import Dataset, DataLoader
 import sys
 sys.path.append("../tools")
 sys.path.append("../utils")
-from constants import CLIP_FEATURE_DIM, REAL_LABEL, FAKE_LABEL, DINO_FEATURE_DIM, REAL_IMG_GEN
+from constants import *
 from utils import extract_color_features
 import open_clip
 import torch
@@ -34,6 +34,8 @@ class DeepFakeDataset(Dataset):
                  img_per_gen: int,
                  balance_real_fake: bool,
                  device: str = device,
+                 gen_to_int = GEN_TO_INT_DATA3,
+                 int_to_gen = INT_TO_GEN_DATA3,
                  use_color_features: bool = False,
                  mode: str = "HSV",
                  n_bins: str = 64):
@@ -47,8 +49,8 @@ class DeepFakeDataset(Dataset):
         self.features = torch.empty((0,CLIP_FEATURE_DIM))
         self.label = []
         self.gen = []
-        self.int_to_gen = {}
-        self.gen_to_int = {}
+        self.int_to_gen = gen_to_int
+        self.gen_to_int = int_to_gen
         self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
         self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL} 
         self.n_fake = len(generators) * img_per_gen
@@ -58,9 +60,6 @@ class DeepFakeDataset(Dataset):
         self.features_max = 0.
         
         #================= Real images processing =================================================================================#
-        k = 0
-        self.int_to_gen[k] = REAL_IMG_GEN
-        self.gen_to_int[REAL_IMG_GEN] = k
         jpg_files = os.listdir(path_to_data + "Flickr2048")
         imgs = []
 
@@ -73,7 +72,7 @@ class DeepFakeDataset(Dataset):
             img = Image.open(path_to_data + REAL_FOLDER_NAME + "/" + file)
             imgs.append(self.transform(img).unsqueeze(0).to(device))
             self.label.append(REAL_LABEL)
-            self.gen.append(k)
+            self.gen.append(self.gen_to_int[REAL_IMG_GEN])
             
             # CLIP features
             if len(imgs) == CUDA_MEMORY_LIMIT: # avoiding CUDA OutOfMeMory Error
@@ -96,9 +95,6 @@ class DeepFakeDataset(Dataset):
         
         #================= Fake images processing =================================================================================#
         for gen in generators:
-            k += 1
-            self.int_to_gen[k] = gen
-            self.gen_to_int[gen] = k
             png_files = [file for file in os.listdir(path_to_data + gen) if file.endswith(".png")]
             imgs = []
         
@@ -108,7 +104,7 @@ class DeepFakeDataset(Dataset):
                 img = Image.open(path_to_data + gen + "/" + file)
                 imgs.append(self.transform(img).unsqueeze(0).to(device))
                 self.label.append(FAKE_LABEL)
-                self.gen.append(k)
+                self.gen.append(self.gen_to_int[gen])
             
             # CLIP features    
             with torch.no_grad():
@@ -208,10 +204,9 @@ class DeepFakeDatasetFastLoad(Dataset):
 class OOD(Dataset):
     def __init__(self, path_to_data: str,
                  load_preprocessed: bool,
-                 device: str=device):
-        
-        if not path_to_data.endswith("/"): path_to_data += "/"
-        
+                 device: str=device,
+                 gen_to_int: dict=GEN_TO_INT_OOD,
+                 int_to_gen: dict=INT_TO_GEN_OOD):
         if load_preprocessed:
             data = torch.load(path_to_data,"cpu")
             self.features = data["features"]
@@ -222,11 +217,12 @@ class OOD(Dataset):
             self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"}
             self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL}
         else:
+            if not path_to_data.endswith("/"): path_to_data += "/"
             self.features = torch.empty((0,DINO_FEATURE_DIM))
             self.label    = torch.empty((0)).int()
             self.gen      = torch.empty((0)).int()
-            self.gen_to_int = {} 
-            self.int_to_gen = {}
+            self.gen_to_int = gen_to_int
+            self.int_to_gen = int_to_gen
             self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
             self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL}
             self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
@@ -238,18 +234,14 @@ class OOD(Dataset):
             FAKE_IMG_PATH = path_to_data + "AI_images/"
 
             real_files = os.listdir(REAL_IMG_PATH)
-            fake_files = os.listdir(FAKE_IMG_PATH)
             
-            k = 0
             #================================= Real images processing =================================#
-            self.int_to_gen[k] = REAL_IMG_GEN
-            self.gen_to_int[REAL_IMG_GEN] = k
             real_imgs = [self.transform(Image.open(REAL_IMG_PATH + file)).unsqueeze(0).to(device) for file in tqdm(real_files,"Processing real images")]
             with torch.no_grad():
                 features = model.encode_image(torch.cat(real_imgs,dim=0))
             self.features = torch.cat((self.features,features.cpu()),dim=0)
             self.label = torch.cat((self.label,torch.Tensor(len(real_imgs) * [REAL_LABEL])),dim=0)
-            self.gen = torch.cat((self.gen,torch.ones(len(real_imgs)) * k),dim=0)
+            self.gen = torch.cat((self.gen,torch.ones(len(real_imgs)) * self.gen_to_int[REAL_IMG_GEN]),dim=0)
             torch.cuda.empty_cache()
             #================================= Fake images processing =================================#
             gen_folder = ['Lexica_images',
@@ -266,12 +258,9 @@ class OOD(Dataset):
                           'Copilot',
                           'img2img_SD1.5',
                           'Photoshop_generativemagnification',
-                          'Photoshop_generativefill'] # clean names
+                          'Photoshop_generativefill'] # clean names used as keys in gen_to_int 
             
             for i, gen in enumerate(gen_folder):
-                k += 1
-                self.int_to_gen[k] = generators[i]
-                self.gen_to_int[generators[i]] = k
                 fake_imgs = []
                 desc = f"Processing images from {generators[i]}"
                 
@@ -282,7 +271,7 @@ class OOD(Dataset):
                     features = model.encode_image(torch.cat(fake_imgs,dim=0))
                 self.features = torch.cat((self.features,features.cpu()),dim=0)
                 self.label = torch.cat((self.label,torch.Tensor(len(fake_imgs) * [FAKE_LABEL])),dim=0)
-                self.gen = torch.cat((self.gen,torch.Tensor(len(fake_imgs) * [k])),dim=0)
+                self.gen = torch.cat((self.gen,torch.Tensor(len(fake_imgs) * [self.gen_to_int[generators[i]]])),dim=0)
                 torch.cuda.empty_cache()
 
     def __len__(self):
