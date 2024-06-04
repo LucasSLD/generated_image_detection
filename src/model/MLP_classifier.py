@@ -3,7 +3,7 @@ import torch.nn as nn
 import sys
 sys.path.append("../tools")
 sys.path.append(".")
-from constants import CLIP_FEATURE_DIM, FAKE_LABEL, REAL_LABEL
+from constants import CLIP_FEATURE_DIM, FAKE_LABEL, REAL_LABEL, REAL_IMG_GEN
 from dataset import DeepFakeDataset
 
 class MultiClassClassifier(nn.Module):
@@ -55,7 +55,7 @@ class MultiClassClassifier(nn.Module):
             classes = classes.cpu().numpy()
         labels = torch.zeros(len(classes))
         for i, e in enumerate(classes):
-            labels[i] = FAKE_LABEL if self.int_to_gen[e] != "null" else REAL_LABEL
+            labels[i] = FAKE_LABEL if self.int_to_gen[e] != REAL_IMG_GEN else REAL_LABEL
         return labels
 
     def predict_classes(self, features, device: str):
