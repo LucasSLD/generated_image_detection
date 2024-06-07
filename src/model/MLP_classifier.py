@@ -4,13 +4,13 @@ import sys
 sys.path.append("../tools")
 sys.path.append(".")
 from constants import CLIP_FEATURE_DIM, FAKE_LABEL, REAL_LABEL, REAL_IMG_GEN
-from dataset import DeepFakeDataset
+
 
 class MultiClassClassifier(nn.Module):
-    def __init__(self,n_features: int=CLIP_FEATURE_DIM):
+    def __init__(self,n_features: int=CLIP_FEATURE_DIM, n_classes: int = 18): #n_classes defaults to 18 as this was the number of classes in /data3/AID
         super().__init__()
         self.fc1 = nn.Linear(n_features,512)
-        self.fc2 = nn.Linear(512,18)
+        self.fc2 = nn.Linear(512,n_classes)
         self.act = nn.ReLU()
         self.features_min = None
         self.features_max = None
@@ -52,7 +52,7 @@ class MultiClassClassifier(nn.Module):
         if not self.int_to_gen:
             raise Exception("set_generators_map hasn't been called. Can't map classes to binary labels.")
         if isinstance(classes,torch.Tensor):
-            classes = classes.cpu().numpy()
+            classes = classes.detach().cpu().numpy()
         labels = torch.zeros(len(classes))
         for i, e in enumerate(classes):
             labels[i] = FAKE_LABEL if self.int_to_gen[e] != REAL_IMG_GEN else REAL_LABEL
@@ -70,23 +70,28 @@ class MultiClassClassifier(nn.Module):
         """
         return torch.argmax(self.forward(features.to(device)),dim=1)
     
-    def predict_binary(self, features, device: str):
+    def predict_binary(self, features, device: str, binary_model: bool=False):
         """Associate features to binary labels. See MultiClassClassifier.int_to_label to see the mapping.
 
         Args:
             features (Tensor): Tensor of shape (n_rows,n_features).
             device (str): device on which the model is located.
+            binary_model (bool): False if n_classes > 2
 
         Returns:
             Tensor: tensor of shape (n_rows)
         """
-        return self.class_to_label(self.predict_classes(features,device)).to(device)
+        if binary_model:
+            return torch.argmax(self.forward(features.to(device)),dim=1)
+        else:
+            return self.class_to_label(self.predict_classes(features,device)).to(device)
 
     def get_model_accuracy_binary(self,
                                   features, 
                                   true_labels,
-                                  device):
-        pred = self.predict_binary(features,device)
+                                  device: str,
+                                  binary_model: bool=False):
+        pred = self.predict_binary(features,device,binary_model)
         return torch.mean(torch.eq(pred,true_labels.to(device)).float()).item()
     
     def get_model_accuracy_multiclass(self, 

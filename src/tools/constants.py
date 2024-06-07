@@ -158,7 +158,7 @@ GEN_TO_GEN = {REAL_IMG_GEN: [REAL_IMG_GEN, "Source_00_RealPhoto"],
                           "Source_6_dreamlike-vRC_512"],
 
 
-            "gigaGan": ["gigaGan","Source_7_gigaGAN_512"],
+            "gigaGan": ["gigaGAN","Source_7_gigaGAN_512"],
 
             "GlideUP": ["GlideUP", "Source_8_glideUP_512"],
 
@@ -231,3 +231,4 @@ LABEL_TO_INT = {"fake":FAKE_LABEL,"real":REAL_LABEL}
 
 PATH_TO_DATA4 = "/data4/saland/data/"
 
+BLACKLIST = ["Source_13_LDM_512","Source_23_ShiftedDiffusion_512"]

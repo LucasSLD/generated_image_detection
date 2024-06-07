@@ -1,5 +1,5 @@
 import albumentations as A
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import sys
 sys.path.append("../tools")
 sys.path.append("../utils")
@@ -11,6 +11,7 @@ import os
 from PIL import Image
 import numpy as np
 from tqdm import tqdm
+from transformers import AutoImageProcessor, AutoModel
 
 transform_torch = A.Compose([
     A.HorizontalFlip(p=0.5),
@@ -32,10 +33,10 @@ def gen2int(gen: str) -> int:
     """Maps generator names to integers using intermediate mapping to a family of generators
 
     Args:
-        gen (str): 
+        gen (str): values in the lists of constants.GEN_TO_GEN
 
     Returns:
-        int: integer value
+        int: integer that can be used as a key with constants.INT_TO_GEN
     """
     for generator in GEN_TO_GEN:
         if gen in GEN_TO_GEN[generator]:
@@ -43,18 +44,26 @@ def gen2int(gen: str) -> int:
     raise Exception(f"{gen} is not in GEN_TO_GEN map (see tools/constants.py)")
 
 def int2gen(i: int) -> str:
+    """Maps intgers to generators
+
+    Args:
+        i (int): a key from constants.INT_TO_GEN
+
+    Returns:
+        str: the name of the generator assiciated with the given key
+    """
     return INT_TO_GEN[i]
 
-def class2label(i: int):
+def class2label(i: int) -> int:
     """maps class to real or fake label
 
     Args:
-        i (int): _description_
+        i (int): A key from constants.INT_TO_GEN
 
     Returns:
-        _type_: _description_
+        int: an integer representing either "real" or "fake" image (see constants.REAL_LABEL and constants.FAKE_LABEL)
     """
-    return REAL_LABEL if INT_TO_GEN[i] == REAL_IMG_GEN else 0 
+    return REAL_LABEL if INT_TO_GEN[i] == REAL_IMG_GEN else FAKE_LABEL
 
 class DeepFakeDataset(Dataset):
     def __init__(self, 
@@ -62,19 +71,29 @@ class DeepFakeDataset(Dataset):
                  img_per_gen: int,
                  balance_real_fake: bool,
                  device: str = device,
+                 feature_type: str = "clip",
                  use_color_features: bool = False,
                  mode: str = "HSV",
                  n_bins: str = 64):
         if not path_to_data.endswith("/"): path_to_data += "/"
-        model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+
+        assert feature_type in ("clip","dino")
+        
+        if feature_type == "clip":
+            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+        elif feature_type == "dino":
+            processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
+            model = AutoModel.from_pretrained('facebook/dinov2-base')
+                    
         model.eval()
 
         generators = [gen for gen in os.listdir(path_to_data) if os.listdir(path_to_data + gen)[0].endswith(".png")] # fake images are .png images
         self.img_per_gen = img_per_gen
-        self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
         self.features = torch.empty((0,CLIP_FEATURE_DIM))
         self.label = []
         self.gen = []
+        self.gen_original_name = [] # for sanity check mapping generators <-> families of generators
         self.int_to_gen = INT_TO_GEN_DATA3
         self.gen_to_int = GEN_TO_INT_DATA3
         self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
@@ -96,12 +115,16 @@ class DeepFakeDataset(Dataset):
             if i >= self.n_real:
                 break
             img = Image.open(path_to_data + REAL_FOLDER_NAME + "/" + file)
-            imgs.append(self.transform(img).unsqueeze(0).to(device))
+            if feature_type == "clip":
+                imgs.append(self.transform(img).unsqueeze(0).to(device))
+            # elif feature_type == "dino":
+                # imgs.append()
             self.label.append(REAL_LABEL)
-            self.gen.append(gen2int(gen))
+            self.gen.append(gen2int(REAL_IMG_GEN))
+            self.gen_original_name.append(REAL_IMG_GEN)
             
             # CLIP features
-            if len(imgs) == CUDA_MEMORY_LIMIT: # avoiding CUDA OutOfMeMory Error
+            if len(imgs) == CUDA_MEMORY_LIMIT: # avoiding CUDA OutOfMemory Error
                 with torch.no_grad():
                     features = model.encode_image(torch.cat(imgs,dim=0))
                 self.features = torch.cat((self.features,features.cpu()),dim=0)
@@ -131,6 +154,7 @@ class DeepFakeDataset(Dataset):
                 imgs.append(self.transform(img).unsqueeze(0).to(device))
                 self.label.append(FAKE_LABEL)
                 self.gen.append(gen2int(gen))
+                self.gen_original_name.append(gen)
             
             # CLIP features    
             with torch.no_grad():
@@ -148,6 +172,9 @@ class DeepFakeDataset(Dataset):
         
         self.features_min = torch.min(self.features,dim=0).values
         self.features_max = torch.max(self.features,dim=0).values
+
+        self.label = torch.Tensor(self.label).type(torch.LongTensor) # pytorch's built-in loss function only works with LongTensor
+        self.gen   = torch.Tensor(self.gen).type(torch.LongTensor)
 
 
     def __len__(self):
@@ -179,6 +206,7 @@ class DeepFakeDataset(Dataset):
             "features": self.features,
             "label": self.label,
             "gen": self.gen,
+            "gen_original_name": self.gen_original_name,
             "int_to_gen": self.int_to_gen,
             "gen_to_int": self.gen_to_int,
             "img_per_gen": self.img_per_gen,
@@ -234,7 +262,7 @@ class OOD(Dataset):
                  gen_to_int: dict=GEN_TO_INT_OOD,
                  int_to_gen: dict=INT_TO_GEN_OOD):
         if load_preprocessed:
-            data = torch.load(path_to_data,"cpu")
+            data = torch.load(path_to_data,device)
             self.features = data["features"]
             self.label    = data["label"]
             self.gen      = data["gen"]
@@ -337,18 +365,124 @@ class OOD(Dataset):
 class DeepFakeTest(Dataset):
     def __init__(self, 
                  path_to_data: str,
-                 img_per_gen: int,
-                 balance_real_fake: bool,
+                 load_from_disk: bool = False,
+                 img_per_gen: int = 100,
+                 balance_real_fake: bool = True,
                  device: str = device):
         
-        if not path_to_data.endswith("/"):
-            path_to_data += "/"
+        if load_from_disk:
+            data = torch.load(path_to_data,device)
+            self.features   = data["features"]
+            self.label      = data["label"]
+            self.gen        = data["gen"]
+            self.gen_original_name = data["gen_original_name"]
+        else:
+            if not path_to_data.endswith("/"):
+                path_to_data += "/"
 
-        self.gen_to_int = GEN_TO_INT_DATA3_TEST
-        self.int_to_gen = INT_TO_GEN_DATA3_TEST
+            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            model.eval()
+
+            self.features = torch.empty((0,CLIP_FEATURE_DIM))
+            self.label = torch.empty(0).int()
+            self.gen   = torch.empty(0).int()
+            self.gen_original_name = []
+            self.transform = self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+
+            real_folder = "Source_00_RealPhoto"
+            N_GENERATORS = 30 # 32 generators initialy but 2 are in constants.BLACKLIST
+
+            for gen in os.listdir(path_to_data):
+                if gen in BLACKLIST: continue
+                imgs = []
+                files = os.listdir(path_to_data + gen)
+                if gen == real_folder and balance_real_fake:
+                    n_imgs = N_GENERATORS * img_per_gen
+                else:
+                    n_imgs = img_per_gen
+                k = 0
+                with tqdm(total=n_imgs,desc=f"{gen}") as bar:
+                    for i, file in enumerate(files):
+                        bar.n = i + 1
+                        bar.refresh()
+                        
+                        img = Image.open(path_to_data + gen + "/" + file)
+                        imgs.append(self.transform(img).unsqueeze(0).to(device))
+                        k += 1
+                        if k == n_imgs: break
+
+                        if len(imgs) == CUDA_MEMORY_LIMIT:
+                            with torch.no_grad():
+                                features = model.encode_image(torch.cat(imgs,dim=0))
+                            self.features = torch.cat((self.features,features.cpu()),dim=0)
+                            imgs = []
+                            torch.cuda.empty_cache()
+
+                    if imgs:
+                        with torch.no_grad():
+                            features = model.encode_image(torch.cat(imgs,dim=0))
+                        self.features = torch.cat((self.features,features.cpu()),dim=0)
+                        torch.cuda.empty_cache()
+
+                    self.label = torch.cat((self.label, torch.ones(n_imgs) * class2label(gen2int(gen))),dim=0)
+                    self.gen = torch.cat((self.gen,torch.ones(n_imgs) * gen2int(gen)),dim=0)
+                    self.gen_original_name += n_imgs * [gen]
+    
+    def __len__(self):
+        return len(self.label)
+    
+    def __getitem__(self, index):
+        return {"label": self.label[index],
+                "features": self.features[index],
+                "generator": self.gen[index]}
+    
+    def save(self, output_path: str):
+        torch.save({
+        "features": self.features,
+        "label": self.label,
+        "gen": self.gen,
+        "gen_original_name": self.gen_original_name}, output_path)
+
+class RealFakePairs(Dataset):
+    def __init__(self, path_to_real_imgs: str, path_to_fake_imgs: str, img_per_class: int, device: str):
+        if not path_to_real_imgs.endswith("/"): path_to_real_imgs += "/"
+        if not path_to_fake_imgs.endswith("/"): path_to_fake_imgs += "/"
+        
+        model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+        model.eval()
+        
+        self.transform = self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+        real_imgs = os.listdir(path_to_real_imgs)
+        fake_imgs = os.listdir(path_to_fake_imgs)
+
         self.features = torch.empty((0,CLIP_FEATURE_DIM))
-        self.label = torch.empty(0).int()
-        self.gen   = torch.empty(0).int()
+        self.label    = torch.empty(0)
 
-        for gen in os.listdir(path_to_data):
-            
+        def extract_features_from_files(files: list, path_to_folder: str, device: str) -> torch.Tensor:
+            preprocessed_imgs = []
+            for file in tqdm(files[:img_per_class],total=img_per_class):
+                img = Image.open(path_to_folder + file)
+                preprocessed_imgs.append(self.transform(img).unsqueeze(0).to(device))
+            with torch.no_grad():
+                return model.encode_image(torch.cat(preprocessed_imgs,dim=0))
+
+        # Real images
+        features = extract_features_from_files(real_imgs, path_to_real_imgs, device)
+        self.features = torch.cat((self.features,features.cpu()),dim=0)
+        self.label    = torch.cat((self.label,REAL_LABEL * torch.ones(len(features))))
+        torch.cuda.empty_cache()
+        
+        # Fake images
+        features = extract_features_from_files(fake_imgs, path_to_fake_imgs, device)
+        self.features = torch.cat((self.features, features.cpu()),dim=0)
+        self.label    = torch.cat((self.label,FAKE_LABEL * torch.ones(len(features))))
+        torch.cuda.empty_cache()
+
+        self.label = self.label.type(torch.LongTensor)
+
+    def __len__(self):
+        return len(self.label)
+    
+    def __getitem__(self, index):
+        return {"label": self.label[index],
+                "features": self.features[index]}
