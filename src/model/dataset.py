@@ -444,41 +444,57 @@ class DeepFakeTest(Dataset):
         "gen_original_name": self.gen_original_name}, output_path)
 
 class RealFakePairs(Dataset):
-    def __init__(self, path_to_real_imgs: str, path_to_fake_imgs: str, img_per_class: int, device: str):
+    def __init__(self, 
+                 path_to_real_imgs: str="",
+                 path_to_fake_imgs: str="", 
+                 img_per_class: int=1, 
+                 device: str="cpu", 
+                 load_from_disk: bool=False,
+                 path: str=""):
+        
         if not path_to_real_imgs.endswith("/"): path_to_real_imgs += "/"
         if not path_to_fake_imgs.endswith("/"): path_to_fake_imgs += "/"
+        self.int_to_label = INT_TO_LABEL
+        self.label_to_int = LABEL_TO_INT
         
-        model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
-        model.eval()
-        
-        self.transform = self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
-        real_imgs = os.listdir(path_to_real_imgs)
-        fake_imgs = os.listdir(path_to_fake_imgs)
+        if load_from_disk:
+            assert path != ""
+            data = torch.load(path)
+            self.features = data["features"]
+            self.label    = data["label"]
 
-        self.features = torch.empty((0,CLIP_FEATURE_DIM))
-        self.label    = torch.empty(0)
+        else:
+            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            model.eval()
 
-        def extract_features_from_files(files: list, path_to_folder: str, device: str) -> torch.Tensor:
-            preprocessed_imgs = []
-            for file in tqdm(files[:img_per_class],total=img_per_class):
-                img = Image.open(path_to_folder + file)
-                preprocessed_imgs.append(self.transform(img).unsqueeze(0).to(device))
-            with torch.no_grad():
-                return model.encode_image(torch.cat(preprocessed_imgs,dim=0))
+            self.transform = self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+            real_imgs = [file for file in os.listdir(path_to_real_imgs) if file.endswith(".jpg")]
+            fake_imgs = [file for file in os.listdir(path_to_fake_imgs) if file.endswith(".jpg")]
 
-        # Real images
-        features = extract_features_from_files(real_imgs, path_to_real_imgs, device)
-        self.features = torch.cat((self.features,features.cpu()),dim=0)
-        self.label    = torch.cat((self.label,REAL_LABEL * torch.ones(len(features))))
-        torch.cuda.empty_cache()
-        
-        # Fake images
-        features = extract_features_from_files(fake_imgs, path_to_fake_imgs, device)
-        self.features = torch.cat((self.features, features.cpu()),dim=0)
-        self.label    = torch.cat((self.label,FAKE_LABEL * torch.ones(len(features))))
-        torch.cuda.empty_cache()
+            self.features = torch.empty((0,CLIP_FEATURE_DIM))
+            self.label    = torch.empty(0)
 
-        self.label = self.label.type(torch.LongTensor)
+            def extract_features_from_files(files: list, path_to_folder: str, device: str) -> torch.Tensor:
+                preprocessed_imgs = []
+                for file in tqdm(files[:img_per_class],total=img_per_class):
+                    img = Image.open(path_to_folder + file)
+                    preprocessed_imgs.append(self.transform(img).unsqueeze(0).to(device))
+                with torch.no_grad():
+                    return model.encode_image(torch.cat(preprocessed_imgs,dim=0))
+
+            # Real images
+            features = extract_features_from_files(real_imgs, path_to_real_imgs, device)
+            self.features = torch.cat((self.features,features.cpu()),dim=0)
+            self.label    = torch.cat((self.label,REAL_LABEL * torch.ones(len(features))))
+            torch.cuda.empty_cache()
+
+            # Fake images
+            features = extract_features_from_files(fake_imgs, path_to_fake_imgs, device)
+            self.features = torch.cat((self.features, features.cpu()),dim=0)
+            self.label    = torch.cat((self.label,FAKE_LABEL * torch.ones(len(features))))
+            torch.cuda.empty_cache()
+
+            self.label = self.label.type(torch.LongTensor)
 
     def __len__(self):
         return len(self.label)
@@ -486,3 +502,10 @@ class RealFakePairs(Dataset):
     def __getitem__(self, index):
         return {"label": self.label[index],
                 "features": self.features[index]}
+    
+    def save(self, output_path: str):
+        torch.save({
+            "features": self.features,
+            "label": self.label,
+            "label_to_int": self.label_to_int,
+            "int_to_label": self.int_to_label}, output_path)
