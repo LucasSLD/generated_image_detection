@@ -1,3 +1,8 @@
+import sys
+sys.path.append("../model")
+from dataset import gen2int
+
+
 SEED = 7
 TMP_DIR = "./_dump/"
 CLIP_FEATURE_DIM = 768 # imension of the feature space of CLIP
@@ -6,7 +11,7 @@ REAL_LABEL = 1
 FAKE_LABEL = 0
 PATH_TO_DATA = "/data3/AID/"
 REAL_IMG_GEN = "null"
-# int -> generator name for model trained on the 18 classes from data3
+# int -> generator name for model trained on the 18 classes from data3/AID
 INT_TO_GEN_DATA3 = {0: REAL_IMG_GEN,
                     1: 'miniDallEUP',
                     2: 'GlideUP',
@@ -25,7 +30,7 @@ INT_TO_GEN_DATA3 = {0: REAL_IMG_GEN,
                     15: 'playground-v2-5-vRC',
                     16: 'stable-1-5-vRC',
                     17: 'Kandinsky-2.1-vRC'}
-# generator name -> int for model trained on the 18 classes from data3
+# generator name -> int for model trained on the 18 classes from data3/AID
 GEN_TO_INT_DATA3 = {REAL_IMG_GEN: 0,
                     'miniDallEUP': 1,
                     'GlideUP': 2,
@@ -232,3 +237,28 @@ LABEL_TO_INT = {"fake":FAKE_LABEL,"real":REAL_LABEL}
 PATH_TO_DATA4 = "/data4/saland/data/"
 
 BLACKLIST = ["Source_13_LDM_512","Source_23_ShiftedDiffusion_512"]
+
+# the images from this generators contain content that is repetitive and very similar (semantic bias)
+AID_BLACKLIST = [GEN_TO_INT['GlideUP'],
+                 GEN_TO_INT['LafitteUP'],
+                 GEN_TO_INT['megaDallEUP'],
+                 GEN_TO_INT['miniDallEUP']]
+
+
+# the images from this generators contain content that is repetitive and very similar (semantic bias)
+AID_TEST_BLACKLIST = [gen2int("Source_1_animagineXL3-1_512"),
+                      gen2int("Source_3_DF-XL_512"),
+                      gen2int("Source_5_dreamlike_512"),
+                      gen2int('Source_8_glideUP_512'),
+                      gen2int('Source_11_kandinsky_512'),
+                      gen2int('Source_12_LafitteUP_512'),
+                      gen2int('Source_14_megaDallEUP_512'),
+                      gen2int('Source_15_miniDallEUP_512'),
+                      gen2int('Source_16_pixart_512'),
+                      gen2int("Source_19_playground-v2_512"),
+                      gen2int('Source_20_playground-v2-5_512'),
+                      gen2int('Source_24_stable-1.5_512'),
+                      gen2int('Source_26_stable-2.1_512'),
+                      gen2int('Source_28_stable-xl_512'),
+                      gen2int('Source_30_styleGAN2_512'),
+                      gen2int('Source_31_styleGAN3_512')]

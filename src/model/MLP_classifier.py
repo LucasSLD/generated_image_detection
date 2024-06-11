@@ -91,7 +91,9 @@ class MultiClassClassifier(nn.Module):
                                   true_labels,
                                   device: str,
                                   binary_model: bool=False):
-        pred = self.predict_binary(features,device,binary_model)
+        self.eval()
+        with torch.no_grad():
+            pred = self.predict_binary(features,device,binary_model)
         return torch.mean(torch.eq(pred,true_labels.to(device)).float()).item()
     
     def get_model_accuracy_multiclass(self, 

@@ -108,7 +108,7 @@ def generate(path_to_img: str,
 
     return images
 
-class DeepFakeDataset(Dataset):
+class DeepFakeDataset(Dataset): # data3/AID
     def __init__(self, 
                  path_to_data: str,
                  img_per_gen: int,
@@ -258,20 +258,36 @@ class DeepFakeDataset(Dataset):
         },output_path)
 
     
-class DeepFakeDatasetFastLoad(Dataset):
+class DeepFakeDatasetFastLoad(Dataset): # /data3/AID
     """Class used to load DeepFakeDataset that has been serialized"""
-    def __init__(self,path_to_data: str) -> None:
+    def __init__(self, path_to_data: str, remove_blacklisted_gen=False) -> None:
         data = torch.load(path_to_data,"cpu")
         self.img_per_gen  = data["img_per_gen"]
-        self.features     = data["features"]
-        self.gen          = data["gen"]
-        self.label        = data["label"]
         self.gen_to_int   = data["gen_to_int"]
         self.int_to_gen   = data["int_to_gen"]
         self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
         self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL}
         self.n_real       = data["n_real"]
         self.n_fake       = data["n_fake"]
+        if remove_blacklisted_gen:
+            self.features = torch.empty((0,CLIP_FEATURE_DIM))
+            self.label = torch.empty(0).type_as(data["label"])
+            self.gen = torch.empty(0).type_as(data["gen"])
+
+            allowed_gen = [key for key in INT_TO_GEN if key not in AID_BLACKLIST]
+            
+            for gen in tqdm(allowed_gen,"filtering"):
+                mask = data["gen"] == gen
+                self.features = torch.cat((self.features,data["features"][mask]),dim=0)
+                self.label    = torch.cat((self.label,data["label"][mask]),dim=0)
+                self.gen      = torch.cat((self.gen,data["gen"][mask]))
+
+        else:
+            self.features = data["features"]
+            self.gen      = data["gen"]
+            self.label    = data["label"]
+
+            
     
     def __len__(self):
         return len(self.label)
@@ -282,7 +298,7 @@ class DeepFakeDatasetFastLoad(Dataset):
                 "generator": self.gen[index]}
     
     def class_to_label(self, classes):
-        """Maps an array of integers representing classes toa list of 0 and 1 depending on whether the class represented a generated or a real image.
+        """Maps an array of integers representing classes to a list of 0 and 1 depending on whether the class represented a generated or a real image.
 
         Args:
             classes (_type_): array of classes taking values in DeepFakeDataset.int_to_gen.keys()
@@ -405,20 +421,40 @@ class OOD(Dataset):
         }, output_path)
 
 
-class DeepFakeTest(Dataset):
+class DeepFakeTest(Dataset): #/data3/AID_TEST
     def __init__(self, 
                  path_to_data: str,
                  load_from_disk: bool = False,
                  img_per_gen: int = 100,
                  balance_real_fake: bool = True,
-                 device: str = device):
+                 device: str = device,
+                 remove_blacklisted_gen: bool=False):
         
         if load_from_disk:
             data = torch.load(path_to_data,device)
-            self.features   = data["features"]
-            self.label      = data["label"]
-            self.gen        = data["gen"]
-            self.gen_original_name = data["gen_original_name"]
+            if remove_blacklisted_gen:
+                allowed_gen = [gen for gen in INT_TO_GEN if gen not in AID_TEST_BLACKLIST]
+                self.features = torch.empty((0,CLIP_FEATURE_DIM)).to(device)
+                self.label = torch.empty(0).type_as(data["label"]).to(device)
+                self.gen = torch.empty(0).type_as(data["gen"]).to(device)
+                allowed_gen.sort(reverse=True) # sort reverse -> gen 0 last (need to process other generators first)
+                for gen in tqdm(allowed_gen,"filtering"):
+                    mask = data["gen"] == gen
+                    if gen == GEN_TO_INT[REAL_IMG_GEN]:
+                        n_real = len(self.label)
+                        self.features = torch.cat((self.features,data["features"][mask][:n_real]),dim=0)
+                        self.label    = torch.cat((self.label,data["label"][mask][:n_real]),dim=0)
+                        self.gen      = torch.cat((self.gen,data["gen"][mask][:n_real]),dim=0)
+                    else:
+                        self.features = torch.cat((self.features,data["features"][mask]),dim=0)
+                        self.label    = torch.cat((self.label,data["label"][mask]),dim=0)
+                        self.gen      = torch.cat((self.gen,data["gen"][mask]),dim=0)
+
+            else:
+                self.features   = data["features"]
+                self.label      = data["label"]
+                self.gen        = data["gen"]
+                self.gen_original_name = data["gen_original_name"]
         else:
             if not path_to_data.endswith("/"):
                 path_to_data += "/"

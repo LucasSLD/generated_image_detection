@@ -16,7 +16,6 @@ import sys
 sys.path.append(".")
 from constants import REAL_LABEL, FAKE_LABEL, REAL_IMG_GEN
 
-
 to_tensor = transforms.ToTensor()
 
 def plot_np_array(img_numpy_array, title : str = None, colorbar=False,figsize=None):
@@ -344,11 +343,11 @@ def extract_color_features(img: Image.Image, mode: str, n_bins: int):
                 hist_V_Cr, _ = np.histogram(V_Cr,bins=n_bins)
                 return hist_S_Cb, hist_V_Cr
 
-def extract_generators_name_aid_test():
-    """Extract the name of the generator from directory's name for AID_TEST
-
-    Args:
-        path (str): path to /data3/AID_TEST
-    """
-    folders = os.listdir("/data3/AID_TEST")
-    
+def plot_loss_history(loss_history: list, 
+                      n_epochs: int, 
+                      figsize: tuple[int, int]=(5,3),
+                      title:str="") -> None:
+    fig = plt.figure(figsize=figsize)
+    plt.title(title)
+    plt.plot(range(1,n_epochs+1,n_epochs//len(loss_history)),loss_history)
+    plt.show()
