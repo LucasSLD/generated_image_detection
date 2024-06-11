@@ -12,6 +12,9 @@ from PIL import Image
 import numpy as np
 from tqdm import tqdm
 from transformers import AutoImageProcessor, AutoModel
+from transformers import BlipProcessor, BlipForConditionalGeneration
+from diffusers import DiffusionPipeline, StableDiffusionPipeline
+from compel import Compel, ReturnedEmbeddingsType
 
 transform_torch = A.Compose([
     A.HorizontalFlip(p=0.5),
@@ -64,6 +67,46 @@ def class2label(i: int) -> int:
         int: an integer representing either "real" or "fake" image (see constants.REAL_LABEL and constants.FAKE_LABEL)
     """
     return REAL_LABEL if INT_TO_GEN[i] == REAL_IMG_GEN else FAKE_LABEL
+
+def generate(path_to_img: str, 
+             model: BlipForConditionalGeneration=BlipForConditionalGeneration.from_pretrained("unography/blip-long-cap",cache_dir="/data4/saland/cache"), 
+             processor: BlipProcessor=BlipProcessor.from_pretrained("unography/blip-long-cap"),
+             diffusion_pipeline: DiffusionPipeline = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16, use_safetensors=True, variant="fp16"),
+             num_inference_steps: int=100,
+             device: str=device):
+    """Extracts the caption from a given image and use this caption as a prompt to generate an image. 
+
+    Args:
+        path_to_img (_type_): _description_
+
+    Returns:
+        _type_: a PIL image
+    """
+
+    model.to(device)
+    diffusion_pipeline.to(device)
+
+    raw_image = Image.open(path_to_img).convert('RGB')
+
+    inputs = processor(raw_image, return_tensors="pt").to(device)
+    pixel_values = inputs.pixel_values
+    out = model.generate(pixel_values=pixel_values, max_length=1000, num_beams=3, repetition_penalty=2.5)
+    prompt = processor.decode(out[0], skip_special_tokens=True)
+    # print(prompt)
+
+    seed = torch.Generator(device='cuda').manual_seed(2)
+    compel = Compel(tokenizer=[diffusion_pipeline.tokenizer, diffusion_pipeline.tokenizer_2] , text_encoder=[diffusion_pipeline.text_encoder, diffusion_pipeline.text_encoder_2], returned_embeddings_type=ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NON_NORMALIZED, requires_pooled=[False, True]) 
+    conditioning, pooled = compel("a camera highly detailed shot of "+prompt)
+    images = diffusion_pipeline(prompt_embeds=conditioning, pooled_prompt_embeds=pooled,num_inference_steps=num_inference_steps).images[0]
+
+
+    inputs2 = processor(images, return_tensors="pt").to(device)
+    pixel_values2 = inputs2.pixel_values
+    out2 = model.generate(pixel_values=pixel_values2, max_length=1000, num_beams=3, repetition_penalty=2.5)
+    prompt2 = processor.decode(out2[0], skip_special_tokens=True)
+    # print(prompt2)
+
+    return images
 
 class DeepFakeDataset(Dataset):
     def __init__(self, 
@@ -443,6 +486,7 @@ class DeepFakeTest(Dataset):
         "gen": self.gen,
         "gen_original_name": self.gen_original_name}, output_path)
 
+
 class RealFakePairs(Dataset):
     def __init__(self, 
                  path_to_real_imgs: str="",
@@ -509,3 +553,110 @@ class RealFakePairs(Dataset):
             "label": self.label,
             "label_to_int": self.label_to_int,
             "int_to_label": self.int_to_label}, output_path)
+
+
+class DoubleCLIP(Dataset):
+    def __init__(self,
+                 load_from_disk: bool=False,
+                 path_to_datset: str="",
+                 path_to_Blip_model_cache: str="/data4/saland/cache",
+                 path_to_imgs: str="",
+                 imgs_per_label: int=100,
+                 num_inference_steps: int=100,
+                 device: str="cpu"):
+        
+        if load_from_disk:
+            data = torch.load(path_to_datset)
+            self.features   = data["features"]
+            self.label      = data["label"]
+            self.imgs_names = data["imgs_names"]
+        else:
+            if not path_to_imgs.endswith("/"): path_to_imgs += "/"
+            real_folder_name = "originals/"
+            fake_folder_name = "generated/"
+
+
+            model_CLIP, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            model_CLIP.eval()
+            
+            processor = BlipProcessor.from_pretrained("unography/blip-long-cap",cache_dir=path_to_Blip_model_cache)
+            model_Blip = BlipForConditionalGeneration.from_pretrained("unography/blip-long-cap",cache_dir=path_to_Blip_model_cache).to(device)
+            diffusion_pipeline = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16, use_safetensors=True, variant="fp16").to(device)
+            diffusion_pipeline.set_progress_bar_config(disable=True)
+
+            self.features = torch.empty((0,CLIP_FEATURE_DIM*2))
+            self.label    = torch.empty(0)
+            self.imgs_names = []
+            self.transform = self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+
+            def extract_features_from_files(files: list, 
+                                            path_to_folder: str,
+                                            model_CLIP: open_clip.CLIP,
+                                            model_Blip: BlipForConditionalGeneration,
+                                            processor_Blip: BlipProcessor,
+                                            diffusion_pipeline: str,
+                                            num_inference_steps: int,
+                                            device: str) -> torch.Tensor:
+                preprocessed_imgs = []
+                preprocessed_imgs_gen = []
+                for file in tqdm(files[:imgs_per_label],total=imgs_per_label):
+                    img = Image.open(path_to_folder + file)
+                    generated_img = generate(path_to_folder + file,
+                                              model=model_Blip,
+                                              processor=processor_Blip,
+                                              diffusion_pipeline=diffusion_pipeline,
+                                              num_inference_steps=num_inference_steps,
+                                              device=device)
+                    preprocessed_imgs.append(self.transform(img).unsqueeze(0).to(device))
+                    preprocessed_imgs_gen.append(self.transform(generated_img).unsqueeze(0).to(device))
+                    self.imgs_names.append(path_to_folder + file)
+
+                with torch.no_grad():
+                    features_imgs = model_CLIP.encode_image(torch.cat(preprocessed_imgs,dim=0))
+                    features_imgs_gen = model_CLIP.encode_image(torch.cat(preprocessed_imgs_gen,dim=0))
+                    return torch.cat((features_imgs,features_imgs_gen),dim=1)
+
+            real_files = [file for file in os.listdir(path_to_imgs + real_folder_name) if file.endswith(".jpg")]
+            fake_files = [file for file in os.listdir(path_to_imgs + fake_folder_name) if file.endswith(".jpg")]
+            
+            # Real images processing
+            features = extract_features_from_files(files=real_files,
+                                                   path_to_folder=path_to_imgs + real_folder_name,
+                                                   model_CLIP=model_CLIP,
+                                                   model_Blip=model_Blip,
+                                                   processor_Blip=processor,
+                                                   diffusion_pipeline=diffusion_pipeline,
+                                                   num_inference_steps=num_inference_steps,
+                                                   device=device)
+            self.features = torch.cat((self.features,features.cpu()),dim=0)
+            self.label = torch.cat((self.label,torch.ones(imgs_per_label) * REAL_LABEL))
+            torch.cuda.empty_cache()
+
+            # Fake images processing
+            features = extract_features_from_files(files=fake_files,
+                                                   path_to_folder=path_to_imgs + fake_folder_name,
+                                                   model_CLIP=model_CLIP,
+                                                   model_Blip=model_Blip,
+                                                   processor_Blip=processor,
+                                                   diffusion_pipeline=diffusion_pipeline,
+                                                   num_inference_steps=num_inference_steps,
+                                                   device=device)
+            self.features = torch.cat((self.features,features.cpu()),dim=0)
+            self.label = torch.cat((self.label,torch.ones(imgs_per_label) * FAKE_LABEL))
+            torch.cuda.empty_cache()
+
+            self.label = self.label.type(torch.LongTensor)
+
+    def __len__(self):
+        return len(self.label)
+
+    def __getitem__(self, index):
+        return {"label":self.label[index],
+                "features":self.features[index],
+                "name":self.imgs_names[index]}
+    
+    def save(self,output_path: str):
+        torch.save({
+            "features":self.features,
+            "label": self.label,
+            "imgs_names": self.imgs_names},output_path)
