@@ -114,10 +114,7 @@ class DeepFakeDataset(Dataset): # data3/AID
                  img_per_gen: int,
                  balance_real_fake: bool,
                  device: str = device,
-                 feature_type: str = "clip",
-                 use_color_features: bool = False,
-                 mode: str = "HSV",
-                 n_bins: str = 64):
+                 feature_type: str = "clip"):
         if not path_to_data.endswith("/"): path_to_data += "/"
 
         assert feature_type in ("clip","dino")
@@ -137,22 +134,17 @@ class DeepFakeDataset(Dataset): # data3/AID
         self.label = []
         self.gen = []
         self.gen_original_name = [] # for sanity check mapping generators <-> families of generators
+        self.names = [] # name of the image
         self.int_to_gen = INT_TO_GEN_DATA3
         self.gen_to_int = GEN_TO_INT_DATA3
         self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
         self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL} 
         self.n_fake = len(generators) * img_per_gen
         self.n_real = self.n_fake if balance_real_fake else img_per_gen
-        # Normalization attributes
-        self.features_min = 0.
-        self.features_max = 0.
         
         #================= Real images processing =================================================================================#
         jpg_files = os.listdir(path_to_data + "Flickr2048")
         imgs = []
-
-        if use_color_features: 
-            color_features = torch.empty((0,n_bins))
 
         for i, file in enumerate(tqdm(jpg_files,total=self.n_real,desc="Processing images from Flickr2048")):
             if i >= self.n_real:
@@ -173,11 +165,6 @@ class DeepFakeDataset(Dataset): # data3/AID
                 self.features = torch.cat((self.features,features.cpu()),dim=0)
                 imgs = []
                 torch.cuda.empty_cache()
-
-            # Color features
-            if use_color_features:
-                hist_S_Cb, hist_V_Cr = extract_color_features(img=img,mode=mode,n_bins=n_bins)
-                color_features = torch.cat((color_features,torch.Tensor(np.hstack(hist_S_Cb,hist_V_Cr))),dim=0)
         
         if imgs: # not empty
             with torch.no_grad(): # extracting the features from the last images
@@ -204,14 +191,6 @@ class DeepFakeDataset(Dataset): # data3/AID
                 features = model.encode_image(torch.cat(imgs,dim=0))
             self.features = torch.cat((self.features,features.cpu()),dim=0)
             torch.cuda.empty_cache()
-
-            # Color features
-            if use_color_features:
-                hist_S_Cb, hist_V_Cr = extract_color_features(img=img,mode=mode,n_bins=n_bins)
-                color_features = torch.cat((color_features,torch.Tensor(np.hstack(hist_S_Cb,hist_V_Cr))),dim=0)
-
-        if use_color_features:
-            self.features = torch.cat((self.features,color_features),dim=1)
         
         self.features_min = torch.min(self.features,dim=0).values
         self.features_max = torch.max(self.features,dim=0).values
