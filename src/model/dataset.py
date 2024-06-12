@@ -319,16 +319,30 @@ class OOD(Dataset):
                  load_preprocessed: bool,
                  device: str=device,
                  gen_to_int: dict=GEN_TO_INT_OOD,
-                 int_to_gen: dict=INT_TO_GEN_OOD):
+                 int_to_gen: dict=INT_TO_GEN_OOD,
+                 remove_blacklisted_gen: bool=False):
         if load_preprocessed:
             data = torch.load(path_to_data,device)
-            self.features = data["features"]
-            self.label    = data["label"]
-            self.gen      = data["gen"]
             self.gen_to_int = data["gen_to_int"] 
             self.int_to_gen = data["int_to_gen"] 
             self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"}
             self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL}
+            
+            if remove_blacklisted_gen:
+                self.features = torch.empty((0,CLIP_FEATURE_DIM)).to(device)
+                self.label = torch.empty(0).type_as(data["label"]).to(device)
+                self.gen = torch.empty(0).type_as(data["gen"]).to(device)
+                allowed_gen = [gen for gen in INT_TO_GEN_OOD if gen not in OOD_BLACKLIST_OLD]
+                for gen in tqdm(allowed_gen,"filtering"):
+                    mask = data["gen"] == gen
+                    self.features = torch.cat((self.features,data["features"][mask]),dim=0)
+                    self.label    = torch.cat((self.label,data["label"][mask]),dim=0)
+                    self.gen      = torch.cat((self.gen,data["gen"][mask]),dim=0)
+
+            else:
+                self.features = data["features"]
+                self.label    = data["label"]
+                self.gen      = data["gen"]
         else:
             if not path_to_data.endswith("/"): path_to_data += "/"
             self.features = torch.empty((0,DINO_FEATURE_DIM))
@@ -696,3 +710,61 @@ class DoubleCLIP(Dataset):
             "features":self.features,
             "label": self.label,
             "imgs_names": self.imgs_names},output_path)
+
+class LongCaption(Dataset):
+    def __init__(self, 
+                 path: str="/data4/saland/data/Long_caption_images/", 
+                 load_from_disk:bool=False,
+                 device: str="cpu"):
+
+
+        if load_from_disk:
+            data = torch.load(path,device)
+            self.features = data["features"]
+            self.label = data["label"].type(torch.LongTensor)
+            self.names = data["names"]
+        else:
+            if not path.endswith("/"):  path += "/"
+            self.features = torch.empty((0,CLIP_FEATURE_DIM)).to(device)
+            self.label    = torch.empty(0).type(torch.LongTensor).to(device)
+            self.names    = []
+
+            real_folder = "real_images/"
+            fake_folder = "generated_images/"
+            real_files  = [file for file in os.listdir(path + real_folder) if file.endswith(".jpg") or file.endswith(".jpeg")]
+            fake_files  = [file for file in os.listdir(path + fake_folder) if file.endswith(".jpg") or file.endswith(".jpeg")]
+
+            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            model.eval()
+
+            self.transform = self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+
+            def extract_features_from_files(files: list, path_to_folder: str, device: str) -> torch.Tensor:
+                    preprocessed_imgs = []
+                    for file in tqdm(files):
+                        img = Image.open(path_to_folder + file)
+                        preprocessed_imgs.append(self.transform(img).unsqueeze(0).to(device))
+                        self.names.append(file)
+                    with torch.no_grad():
+                        return model.encode_image(torch.cat(preprocessed_imgs,dim=0))
+
+            features = extract_features_from_files(real_files,path+real_folder,device)
+            self.features = torch.cat((self.features,features),dim=0)
+            self.label = torch.cat((self.label,torch.ones(len(features)).to(device) * REAL_LABEL),dim=0)
+
+            features = extract_features_from_files(fake_files,path+fake_folder,device)
+            self.features = torch.cat((self.features,features),dim=0)
+            self.label    = torch.cat((self.label,torch.ones(len(features)).to(device) * FAKE_LABEL),dim=0)
+
+    def __len__(self):
+        return len(self.label)
+    
+    def __getitem__(self, index):
+        return {"label": self.label[index],
+                "features": self.features[index],
+                "names":self.names[index]}
+
+    def save(self,output_path:str):
+        torch.save({"features":self.features,
+                    "label":self.label,
+                    "names":self.names},output_path)

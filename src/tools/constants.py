@@ -1,6 +1,16 @@
-import sys
-sys.path.append("../model")
-from dataset import gen2int
+def gen2int(gen: str) -> int:
+    """Maps generator names to integers using intermediate mapping to a family of generators
+
+    Args:
+        gen (str): values in the lists of constants.GEN_TO_GEN
+
+    Returns:
+        int: integer that can be used as a key with constants.INT_TO_GEN
+    """
+    for generator in GEN_TO_GEN:
+        if gen in GEN_TO_GEN[generator]:
+            return GEN_TO_INT[generator]
+    raise Exception(f"{gen} is not in GEN_TO_GEN map (see tools/constants.py)")
 
 
 SEED = 7
@@ -262,3 +272,7 @@ AID_TEST_BLACKLIST = [gen2int("Source_1_animagineXL3-1_512"),
                       gen2int('Source_28_stable-xl_512'),
                       gen2int('Source_30_styleGAN2_512'),
                       gen2int('Source_31_styleGAN3_512')]
+
+OOD_BLACKLIST_OLD = [GEN_TO_INT_OOD['img2img_SD1.5'],
+                     GEN_TO_INT_OOD['Photoshop_generativefill'],
+                     GEN_TO_INT_OOD['Photoshop_generativemagnification']]

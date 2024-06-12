@@ -102,3 +102,16 @@ class MultiClassClassifier(nn.Module):
                                       device): 
         pred = self.predict_classes(features,device)
         return torch.mean(torch.eq(pred,true_classes.to(device)).float()).item()
+    
+    def get_model_accuracy_binary_per_gen(self,
+                                          features,
+                                          true_labels,
+                                          true_gen,
+                                          device:str,
+                                          binary_model:bool,
+                                          gen_to_int:dict):
+        accuracy = {}
+        for gen in gen_to_int:
+            mask = true_gen == gen_to_int[gen]
+            accuracy[gen] = self.get_model_accuracy_binary(features[mask],true_labels[mask],device=device, binary_model=binary_model)
+        return accuracy
