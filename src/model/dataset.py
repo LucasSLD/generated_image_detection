@@ -15,6 +15,7 @@ from transformers import AutoImageProcessor, AutoModel
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from diffusers import DiffusionPipeline, StableDiffusionPipeline
 from compel import Compel, ReturnedEmbeddingsType
+from copy import deepcopy
 
 transform_torch = A.Compose([
     A.HorizontalFlip(p=0.5),
@@ -26,6 +27,29 @@ transform_torch = A.Compose([
 	A.ImageCompression(quality_lower=90,quality_upper=90,p=1/3),
     ], p=3/4)
     ], p=1.0)
+
+transform_40 = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomRotate90(p=1.0),
+    A.ImageCompression(quality_lower=40,quality_upper=40,p=1.0)]) 
+
+transform_65 = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomRotate90(p=1.0),
+    A.ImageCompression(quality_lower=65,quality_upper=65,p=1.0)]) 
+
+transform_90 = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomRotate90(p=1.0),
+    A.ImageCompression(quality_lower=90,quality_upper=90,p=1.0)]) 
+
+transform_100 = A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomRotate90(p=1.0)]) 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -108,95 +132,144 @@ def generate(path_to_img: str,
 
     return images
 
+def shuffle_data(dataset: Dataset,
+                 in_place: bool = False, 
+                 seed: int=SEED):
+    rng = torch.Generator().manual_seed(seed)
+    permutation = torch.randperm(len(dataset),generator=rng)
+    if not in_place:
+        dataset = deepcopy(dataset)
+    for key in dataset.__dict__:
+        if type(dataset.__getattribute__(key)) == torch.Tensor:
+            print(f"shuffling {key}")
+            dataset.__setattr__(key,dataset.__getattribute__(key)[permutation])
+    return dataset
+
+def select_slice(data: Dataset,
+                 n_elements: int, 
+                 attributes_to_silce=("label","features","gen")):
+    data = deepcopy(data)
+    for key in data.__dict__:
+        if key in attributes_to_silce:
+            data.__setattr__(key,data.__getattribute__(key)[:n_elements])
+    return data
+            
+
 class DeepFakeDataset(Dataset): # data3/AID
     def __init__(self, 
                  path_to_data: str,
-                 img_per_gen: int,
-                 balance_real_fake: bool,
+                 img_per_gen: int=100,
+                 balance_real_fake: bool=True,
                  device: str = device,
+                 load_from_disk = False,
                  feature_type: str = "clip"):
-        if not path_to_data.endswith("/"): path_to_data += "/"
 
         assert feature_type in ("clip","dino")
         
-        if feature_type == "clip":
-            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
-            self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
-        elif feature_type == "dino":
-            processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
-            model = AutoModel.from_pretrained('facebook/dinov2-base')
-                    
-        model.eval()
-
-        generators = [gen for gen in os.listdir(path_to_data) if os.listdir(path_to_data + gen)[0].endswith(".png")] # fake images are .png images
-        self.img_per_gen = img_per_gen
-        self.features = torch.empty((0,CLIP_FEATURE_DIM))
-        self.label = []
-        self.gen = []
-        self.gen_original_name = [] # for sanity check mapping generators <-> families of generators
-        self.names = [] # name of the image
-        self.int_to_gen = INT_TO_GEN_DATA3
-        self.gen_to_int = GEN_TO_INT_DATA3
-        self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
-        self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL} 
-        self.n_fake = len(generators) * img_per_gen
-        self.n_real = self.n_fake if balance_real_fake else img_per_gen
-        
-        #================= Real images processing =================================================================================#
-        jpg_files = os.listdir(path_to_data + "Flickr2048")
-        imgs = []
-
-        for i, file in enumerate(tqdm(jpg_files,total=self.n_real,desc="Processing images from Flickr2048")):
-            if i >= self.n_real:
-                break
-            img = Image.open(path_to_data + REAL_FOLDER_NAME + "/" + file)
+        if load_from_disk:
+            data = torch.load(path_to_data)
+            self.features = data["features"]
+            self.label    = data["label"]
+            self.gen      = data["gen"]
+            self.gen_original_name = data["gen_original_name"]
+            self.name     = data["name"]
+            self.int_to_gen = INT_TO_GEN
+            self.gen_to_int = GEN_TO_INT
+        else:
+            if not path_to_data.endswith("/"): path_to_data += "/"
             if feature_type == "clip":
-                imgs.append(self.transform(img).unsqueeze(0).to(device))
-            # elif feature_type == "dino":
-                # imgs.append()
-            self.label.append(REAL_LABEL)
-            self.gen.append(gen2int(REAL_IMG_GEN))
-            self.gen_original_name.append(REAL_IMG_GEN)
-            
-            # CLIP features
-            if len(imgs) == CUDA_MEMORY_LIMIT: # avoiding CUDA OutOfMemory Error
-                with torch.no_grad():
-                    features = model.encode_image(torch.cat(imgs,dim=0))
-                self.features = torch.cat((self.features,features.cpu()),dim=0)
-                imgs = []
-                torch.cuda.empty_cache()
-        
-        if imgs: # not empty
-            with torch.no_grad(): # extracting the features from the last images
-                features = model.encode_image(torch.cat(imgs,dim=0))
-            self.features = torch.cat((self.features,features.cpu()),dim=0)
-        torch.cuda.empty_cache()
-        
-        #================= Fake images processing =================================================================================#
-        for gen in generators:
-            png_files = [file for file in os.listdir(path_to_data + gen) if file.endswith(".png")]
-            imgs = []
-        
-            for i, file in enumerate(tqdm(png_files,f"Processing images from {gen}",total=min(len(png_files),img_per_gen))):
-                if i >= img_per_gen:
-                    break
-                img = Image.open(path_to_data + gen + "/" + file)
-                imgs.append(self.transform(img).unsqueeze(0).to(device))
-                self.label.append(FAKE_LABEL)
-                self.gen.append(gen2int(gen))
-                self.gen_original_name.append(gen)
-            
-            # CLIP features    
-            with torch.no_grad():
-                features = model.encode_image(torch.cat(imgs,dim=0))
-            self.features = torch.cat((self.features,features.cpu()),dim=0)
-            torch.cuda.empty_cache()
-        
-        self.features_min = torch.min(self.features,dim=0).values
-        self.features_max = torch.max(self.features,dim=0).values
+                model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+                self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+            elif feature_type == "dino":
+                processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
+                model = AutoModel.from_pretrained('facebook/dinov2-base')
+                model.to(device)
+                model.eval()
+                        
+            model.eval()
 
-        self.label = torch.Tensor(self.label).type(torch.LongTensor) # pytorch's built-in loss function only works with LongTensor
-        self.gen   = torch.Tensor(self.gen).type(torch.LongTensor)
+            generators = [gen for gen in os.listdir(path_to_data) if os.listdir(path_to_data + gen)[0].endswith(".png")] # fake images are .png images
+            self.img_per_gen = img_per_gen
+            self.features = torch.empty((0,CLIP_FEATURE_DIM))
+            self.label = []
+            self.gen = []
+            self.gen_original_name = [] # for sanity check mapping generators <-> families of generators
+            self.name = [] # name of the image
+            self.int_to_gen = INT_TO_GEN
+            self.gen_to_int = GEN_TO_INT
+            self.n_fake = len(generators) * img_per_gen
+            self.n_real = self.n_fake if balance_real_fake else img_per_gen
+            
+            #================= Real images processing =================================================================================#
+            jpg_files = os.listdir(path_to_data + "Flickr2048")
+            imgs = []
+
+            def extract_features(imgs: list, feature_type: str):
+                with torch.no_grad():
+                    if feature_type == "clip":
+                        features = model.encode_image(torch.cat(imgs,dim=0))
+                    elif feature_type == "dino":
+                        inputs = processor(images=imgs,return_tensors="pt")
+                        features = model(inputs["pixel_values"].to(device))[1]
+                return features
+                
+
+            for i, file in enumerate(tqdm(jpg_files,total=self.n_real,desc="Processing images from Flickr2048")):
+                if i >= self.n_real:
+                    break
+                img = Image.open(path_to_data + REAL_FOLDER_NAME + "/" + file)
+                if feature_type == "clip":
+                    imgs.append(self.transform(img).unsqueeze(0).to(device))
+                elif feature_type == "dino":
+                    imgs.append(img)
+                self.label.append(REAL_LABEL)
+                self.gen.append(gen2int(REAL_IMG_GEN))
+                self.gen_original_name.append(REAL_IMG_GEN)
+                self.name.append(file)
+                # CLIP features
+                if len(imgs) == CUDA_MEMORY_LIMIT: # avoiding CUDA OutOfMemory Error
+                    features = extract_features(imgs,feature_type)
+                    self.features = torch.cat((self.features,features.cpu()),dim=0)
+                    imgs = []
+                    torch.cuda.empty_cache()
+            
+            if imgs: # not empty
+                features = extract_features(imgs,feature_type) # extracting the features from the last images
+                self.features = torch.cat((self.features,features.cpu()),dim=0)
+            torch.cuda.empty_cache()
+            
+            #================= Fake images processing =================================================================================#
+            for gen in generators:
+                png_files = [file for file in os.listdir(path_to_data + gen) if file.endswith(".png")]
+                imgs = []
+            
+                for i, file in enumerate(tqdm(png_files,f"Processing images from {gen}",total=min(len(png_files),img_per_gen))):
+                    if i >= img_per_gen:
+                        break
+                    img = Image.open(path_to_data + gen + "/" + file)
+                    if feature_type == "clip":
+                        imgs.append(self.transform(img).unsqueeze(0).to(device))
+                    elif feature_type == "dino":
+                        imgs.append(img)
+                    self.label.append(FAKE_LABEL)
+                    self.gen.append(gen2int(gen))
+                    self.gen_original_name.append(gen)
+                    self.name.append(file)
+                    # CLIP features
+                    if len(imgs) == CUDA_MEMORY_LIMIT: # avoiding CUDA OutOfMemory Error
+                        features = extract_features(imgs,feature_type)
+                        self.features = torch.cat((self.features,features.cpu()),dim=0)
+                        imgs = []
+                        torch.cuda.empty_cache()
+                
+                # CLIP features
+                if imgs:    
+                    features = extract_features(imgs,feature_type)
+                    self.features = torch.cat((self.features,features.cpu()),dim=0)
+                torch.cuda.empty_cache()
+
+            self.label = torch.Tensor(self.label).type(torch.LongTensor) # pytorch's built-in loss function only works with LongTensor
+            self.gen   = torch.Tensor(self.gen).type(torch.LongTensor)
 
 
     def __len__(self):
@@ -205,7 +278,8 @@ class DeepFakeDataset(Dataset): # data3/AID
     def __getitem__(self, index):
         return {"label" : self.label[index], 
                 "features" : self.features[index],
-                "generator" : self.gen[index]}
+                "generator" : self.gen[index],
+                "name": self.name[index]}
     
     def class_to_label(self, classes):
         """Maps an array of integers representing classes toa list of 0 and 1 depending on whether the class represented a generated or a real image.
@@ -233,7 +307,8 @@ class DeepFakeDataset(Dataset): # data3/AID
             "gen_to_int": self.gen_to_int,
             "img_per_gen": self.img_per_gen,
             "n_real": self.n_real,
-            "n_fake": self.n_fake
+            "n_fake": self.n_fake,
+            "name": self.name
         },output_path)
 
     
@@ -535,6 +610,7 @@ class RealFakePairs(Dataset):
             data = torch.load(path)
             self.features = data["features"]
             self.label    = data["label"]
+            # self.name     = data["name"] 
 
         else:
             model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
@@ -546,12 +622,14 @@ class RealFakePairs(Dataset):
 
             self.features = torch.empty((0,CLIP_FEATURE_DIM))
             self.label    = torch.empty(0)
+            self.name     = []
 
             def extract_features_from_files(files: list, path_to_folder: str, device: str) -> torch.Tensor:
                 preprocessed_imgs = []
                 for file in tqdm(files[:img_per_class],total=img_per_class):
                     img = Image.open(path_to_folder + file)
                     preprocessed_imgs.append(self.transform(img).unsqueeze(0).to(device))
+                    self.name.append(file)
                 with torch.no_grad():
                     return model.encode_image(torch.cat(preprocessed_imgs,dim=0))
 
@@ -574,14 +652,16 @@ class RealFakePairs(Dataset):
     
     def __getitem__(self, index):
         return {"label": self.label[index],
-                "features": self.features[index]}
+                "features": self.features[index],
+                "name": self.name[index]}
     
     def save(self, output_path: str):
         torch.save({
             "features": self.features,
             "label": self.label,
             "label_to_int": self.label_to_int,
-            "int_to_label": self.int_to_label}, output_path)
+            "int_to_label": self.int_to_label,
+            "name":self.name}, output_path)
 
 
 class DoubleCLIP(Dataset):
@@ -690,6 +770,7 @@ class DoubleCLIP(Dataset):
             "label": self.label,
             "imgs_names": self.imgs_names},output_path)
 
+
 class LongCaption(Dataset):
     def __init__(self, 
                  path: str="/data4/saland/data/Long_caption_images/", 
@@ -747,3 +828,206 @@ class LongCaption(Dataset):
         torch.save({"features":self.features,
                     "label":self.label,
                     "names":self.names},output_path)
+
+
+class TestMeta(Dataset):
+    def __init__(self,
+                 path: str="/data3/test_meta_learning/",
+                 load_from_disk:bool = False,
+                 device: str="cpu"):
+        
+        if load_from_disk:
+            data = torch.load(path)
+            self.features = data["features"]
+            self.label = data["label"]
+            self.gen = data["gen"]
+            self.gen_original_name = data["gen_original_name"]
+            self.name = data["name"]
+            self.folder = data["folder"]
+            self.quality = data["quality"]
+        else:
+            if not path.endswith("/"): path += "/"
+            self.features = torch.empty((0,CLIP_FEATURE_DIM))
+            self.label = []
+            self.gen = []
+            self.gen_original_name = []
+            self.name = []
+            self.folder = []
+            self.quality = [] # 100 - 90 - 65 - 40 (jpg)
+
+            qualities = (40, 65, 90, 100)
+
+            self.transform = {
+                40: lambda img : preprocess(Image.fromarray(transform_40(image=np.asarray(img.convert("RGB")))["image"])),
+                65: lambda img : preprocess(Image.fromarray(transform_65(image=np.asarray(img.convert("RGB")))["image"])),
+                90: lambda img : preprocess(Image.fromarray(transform_90(image=np.asarray(img.convert("RGB")))["image"])),
+                100: lambda img : preprocess(Image.fromarray(transform_100(image=np.asarray(img.convert("RGB")))["image"]))}
+
+            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            model.eval()
+
+            real_folder = "Orig/"
+            fake_folder = "Gen/"
+
+            generators = os.listdir(path + fake_folder)
+
+            def extract_features(imgs):
+                with torch.no_grad():
+                    features = model.encode_image(torch.cat(imgs,dim=0))
+                return features
+
+            for gen in generators:
+                files = [file for file in os.listdir(path + fake_folder + gen) if file.endswith("jpg") or 
+                                                                                  file.endswith("jpeg") or
+                                                                                  file.endswith("png")]
+                for q in tqdm(qualities,"quality"):
+                    imgs = []
+                    for file in tqdm(files,str(gen)):
+                        name = path + fake_folder + gen + "/" + file
+                        img = Image.open(name)
+                        imgs.append(self.transform[q](img).unsqueeze(0).to(device))
+
+                        self.label.append(FAKE_LABEL)
+                        self.gen.append(gen2int(gen))
+                        self.gen_original_name.append(gen)
+                        self.name.append(name)
+                        self.folder.append(fake_folder + gen)
+                        self.quality.append(q)
+
+                        if len(imgs) == CUDA_MEMORY_LIMIT:
+                            features = extract_features(imgs)
+                            self.features = torch.cat((self.features,features.cpu()),dim=0)
+                            imgs = []
+                            torch.cuda.empty_cache()
+
+                    if imgs:
+                        features = extract_features(imgs)
+                        self.features = torch.cat((self.features,features.cpu()),dim=0)
+                        imgs = []
+                        torch.cuda.empty_cache()
+
+            real_subfolders = os.listdir(path + real_folder)
+            for subfolder in real_subfolders:
+                files = [file for file in os.listdir(path + real_folder + subfolder) if file.endswith("jpg") or 
+                                                                                        file.endswith("jpeg") or
+                                                                                        file.endswith("png")]
+                for q in tqdm(qualities):
+                    imgs = []
+                    for file in tqdm(files,str(subfolder)):
+                        name = path + real_folder + subfolder + "/" + file
+                        img = Image.open(name)
+                        imgs.append(self.transform[q](img).unsqueeze(0).to(device))
+
+                        self.label.append(REAL_LABEL)
+                        self.gen.append(gen2int(REAL_IMG_GEN))
+                        self.gen_original_name.append(REAL_IMG_GEN)
+                        self.name.append(name)
+                        self.folder.append(real_folder + subfolder)
+                        self.quality.append(q)
+
+                        if len(imgs) == CUDA_MEMORY_LIMIT:
+                            features = extract_features(imgs)
+                            self.features = torch.cat((self.features,features.cpu()),dim=0)
+                            imgs = []
+                            torch.cuda.empty_cache()
+
+                    if imgs:
+                        features = extract_features(imgs)
+                        self.features = torch.cat((self.features,features.cpu()),dim=0)
+                        imgs = []
+                        torch.cuda.empty_cache()
+
+
+            self.gen = torch.Tensor(self.gen).type(torch.LongTensor)
+            self.label = torch.Tensor(self.label).type(torch.LongTensor)
+
+    def __len__(self):
+        return len(self.label)
+
+    def __getitem__(self,index):
+        return {"features":self.features[index],
+                "label":self.label[index],
+                "gen":self.gen[index],
+                "name":self.name[index]}
+
+    def save(self, output_path:str):
+        torch.save({
+            "features": self.features,
+            "label": self.label,
+            "gen": self.gen,
+            "name": self.name,
+            "folder": self.folder,
+            "quality":self.quality,
+            "gen_original_name": self.gen_original_name}, output_path)
+        
+class FlickrAndPairs(Dataset): # mix of data from real_fake_pairs and Flickr + generated images from AID
+    def __init__(self,
+                 path: str="",
+                 load_from_disk: bool=False,
+                 device: str="cpu"):
+        
+        if load_from_disk:
+            data = torch.load(path)
+            self.features = data["features"]
+            self.label = data["label"]
+        else:
+            pairs_data = RealFakePairs(device=device,
+                                       load_from_disk=True,
+                                       path="/data4/saland/data/real_fake_pairs_1000_name.pt")
+
+            self.features = pairs_data.features
+            self.label    = pairs_data.label
+            
+            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            model.eval()
+
+            self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+
+            def extract_features_from_files(files, path: str):
+                imgs = []
+                for file in tqdm(files,path):
+                    img = Image.open(path + file)
+                    imgs.append(self.transform(img).unsqueeze(0).to(device))
+                with torch.no_grad():
+                    return model.encode_image(torch.cat(imgs,dim=0))
+
+            path_to_flickr = "/data4/saland/data/2k_real_2k_fake/Flickr/"
+
+            files = os.listdir(path_to_flickr)
+            features = extract_features_from_files(files,path_to_flickr)
+            self.features = torch.cat((self.features,features.cpu()),dim=0)
+            self.label = torch.cat((self.label, torch.ones(len(features)) * REAL_LABEL))
+
+            n_per_gen = 333
+
+            path_to_firefly = "/data4/saland/data/firefly/"
+            files = os.listdir(path_to_firefly)[:n_per_gen]
+            features = extract_features_from_files(files,path_to_firefly)
+            self.features = torch.cat((self.features,features.cpu()),dim=0)
+            self.label = torch.cat((self.label, torch.ones(len(features)) * FAKE_LABEL))
+
+
+            path_to_dalle3 = "/data4/saland/data/dalle3/"
+            files = os.listdir(path_to_dalle3)[:n_per_gen]
+            features = extract_features_from_files(files,path_to_dalle3)
+            self.features = torch.cat((self.features,features.cpu()),dim=0)
+            self.label = torch.cat((self.label, torch.ones(len(features)) * FAKE_LABEL))
+            
+            path_to_midjourney = "/data4/saland/data/midjourney_v6/"
+            files = os.listdir(path_to_midjourney)[:n_per_gen]
+            features = extract_features_from_files(files,path_to_midjourney)
+            self.features = torch.cat((self.features,features.cpu()),dim=0)
+            self.label = torch.cat((self.label, torch.ones(len(features)) * FAKE_LABEL))
+
+            self.label = self.label.type(torch.LongTensor)
+
+
+    def __len__(self):
+        return len(self.label)
+    
+    def __getitem__(self,index):
+        return {"features": self.features[index],
+                "label": self.label[index]}
+    
+    def save(self, output_path: str):
+        torch.save({"features":self.features,"label":self.label},output_path)

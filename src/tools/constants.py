@@ -156,54 +156,73 @@ GEN_TO_GEN = {REAL_IMG_GEN: [REAL_IMG_GEN, "Source_00_RealPhoto"],
                                     "Source_26_stable-2.1_512",
                                     "Source_27_stable-2-1-vRC_512",
                                     "Source_28_stable-xl_512",
-                                    "Source_29_stable-xl-vRC_512"],
+                                    "Source_29_stable-xl-vRC_512",
+                                    "Source_25_SD1_5",
+                                    "Source_27_SD2_1",
+                                    "Source_29_SDXL",
+                                    "LongCaptions"],
             
             "Kandisky":["Kandinsky-2.1-vRC",
                         "Kandinsky-2.2-vRC",
                         "Source_10_Kandinsky-2.2-vRC_512",
                         "Source_11_kandinsky_512",
-                        "Source_9_Kandinsky-2.1-vRC_512"],
+                        "Source_9_Kandinsky-2.1-vRC_512",
+                        "Source_9_10_kandinsky"],
             
             "DF_XL": ["DF-XL-vRC",
                       "Source_3_DF-XL_512",
-                      "Source_4_DF-XL-vRC_512"],
+                      "Source_4_DF-XL-vRC_512",
+                      "Source_4_DF-XL"],
             
             "dreamlike": ["dreamlike-vRC",
                           "Source_5_dreamlike_512",
-                          "Source_6_dreamlike-vRC_512"],
+                          "Source_6_dreamlike-vRC_512",
+                          "Source_6_dreamlike"],
 
 
-            "gigaGan": ["gigaGAN","Source_7_gigaGAN_512"],
+            "gigaGan": ["gigaGAN","Source_7_gigaGAN_512","Source_7_gigaGan"],
 
             "GlideUP": ["GlideUP", "Source_8_glideUP_512"],
 
             "LafitteUP": ["LafitteUP", "Source_12_LafitteUP_512"],
 
-            "LCM_Dreamshaper": ["LCM_Dreamshaper-v7-vRC", "Source_32_LCM_Dreamshaper-v7-vRC_512"],
+            "LCM_Dreamshaper": ["LCM_Dreamshaper-v7-vRC", 
+                                "Source_32_LCM_Dreamshaper-v7-vRC_512",
+                                "Source_32_Dreamshaper"],
 
-            "megaDallEUP": ["megaDallEUP", "Source_14_megaDallEUP_512"],
+            "megaDallEUP": ["megaDallEUP", "Source_14_megaDallEUP_512","Copilot_images"],
 
             "miniDallEUP": ["miniDallEUP", "Source_15_miniDallEUP_512"],
 
             "pixart": ["pixartSigma-vRC",
                        "Source_16_pixart_512",
                        "Source_17_pixartAlpha-vRC_512",
-                       "Source_18_pixartSigma-vRC_512"],
+                       "Source_18_pixartSigma-vRC_512",
+                       "Source_18_pixartSigma",
+                       "Source_17_pixartAlpha"],
 
             "playground": ["playground-v2-5-vRC",
                            "playground-v2-vRC",
                            "Source_19_playground-v2_512",
                            "Source_20_playground-v2-5_512",
                            "Source_21_playground-v2-5-vRC_512",
-                           "Source_22_playground-v2-vRC_512"],
+                           "Source_22_playground-v2-vRC_512",
+                           "Source_21_playground"],
             
             "styleGan2": ["styleGan2","Source_30_styleGAN2_512"],
             
-            "styleGan3": ["styleGan3", "Source_31_styleGAN3_512"],
+            "styleGan3": ["styleGan3", 
+                          "Source_31_styleGAN3_512",
+                          "Source_30_31_stylegan2_3",
+                          "Ideogram_images",
+                          "Leonardo_images",
+                          "Lexica_images",
+                          "MidJourneyV6"], # put generators that I didn't know where to put
 
             "animagineXL": ["animagineXL3-1-vRC",
                             "Source_1_animagineXL3-1_512",
-                            "Source_2_animagineXL3-1-vRC_512"]
+                            "Source_2_animagineXL3-1-vRC_512",
+                            "Source_2_animagineXL3"]
             }
 
 GEN_TO_INT = {REAL_IMG_GEN: 0,
