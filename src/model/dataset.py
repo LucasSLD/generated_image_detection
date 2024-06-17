@@ -948,7 +948,8 @@ class TestMeta(Dataset):
         return {"features":self.features[index],
                 "label":self.label[index],
                 "gen":self.gen[index],
-                "name":self.name[index]}
+                "name":self.name[index],
+                "gen_original_name":self.gen_original_name[index]}
 
     def save(self, output_path:str):
         torch.save({
@@ -1031,3 +1032,38 @@ class FlickrAndPairs(Dataset): # mix of data from real_fake_pairs and Flickr + g
     
     def save(self, output_path: str):
         torch.save({"features":self.features,"label":self.label},output_path)
+
+class TaskA(Dataset):
+    def __init__(self, load_from_disk: bool, path: str="" ,device: str="cpu"):
+        self.dir_name = "/data3/TEST/A/"
+        
+        if load_from_disk:
+            data = torch.load(path)
+            self.features = data["features"]
+            self.image_name = data["image_name"] 
+        else:
+            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            model.eval()
+
+            self.image_name = []
+            self.features   = {}
+            
+            files = os.listdir(self.dir_name)
+
+            for img_name in tqdm(files): 
+                img = preprocess(Image.open(self.dir_name + img_name)).unsqueeze(0).to(device)
+                self.image_name.append(img_name)
+                with torch.no_grad():
+                    self.features[img_name] = model.encode_image(img)
+        
+    def __len__(self):
+        return len(self.image_name)
+
+    def __getitem__(self,index):
+        return {
+            "image_name": self.image_name[index],
+            "dir_name": self.dir_name,
+            "features": self.features[self.image_name[index]]}
+    
+    def save(self, output_path: str):
+        torch.save({"features":self.features,"image_name":self.image_name},output_path)
