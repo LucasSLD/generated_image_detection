@@ -217,7 +217,16 @@ GEN_TO_GEN = {REAL_IMG_GEN: [REAL_IMG_GEN, "Source_00_RealPhoto"],
                           "Ideogram_images",
                           "Leonardo_images",
                           "Lexica_images",
-                          "MidJourneyV6"], # put generators that I didn't know where to put
+                          "MidJourneyV6",
+                          "alpha_genmo",
+                          "bingcreator",
+                          "deepdream",
+                          "firefly",
+                          "google_sge",
+                          "metaAI",
+                          "midjourney",
+                          "runway",
+                          "shutterstock"], # put generators that I didn't know where to put
 
             "animagineXL": ["animagineXL3-1-vRC",
                             "Source_1_animagineXL3-1_512",

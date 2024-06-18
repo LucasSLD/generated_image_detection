@@ -56,19 +56,19 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 REAL_FOLDER_NAME = "Flickr2048"
 CUDA_MEMORY_LIMIT = 1000
 
-def gen2int(gen: str) -> int:
-    """Maps generator names to integers using intermediate mapping to a family of generators
+# def gen2int(gen: str) -> int:
+#     """Maps generator names to integers using intermediate mapping to a family of generators
 
-    Args:
-        gen (str): values in the lists of constants.GEN_TO_GEN
+#     Args:
+#         gen (str): values in the lists of constants.GEN_TO_GEN
 
-    Returns:
-        int: integer that can be used as a key with constants.INT_TO_GEN
-    """
-    for generator in GEN_TO_GEN:
-        if gen in GEN_TO_GEN[generator]:
-            return GEN_TO_INT[generator]
-    raise Exception(f"{gen} is not in GEN_TO_GEN map (see tools/constants.py)")
+#     Returns:
+#         int: integer that can be used as a key with constants.INT_TO_GEN
+#     """
+#     for generator in GEN_TO_GEN:
+#         if gen in GEN_TO_GEN[generator]:
+#             return GEN_TO_INT[generator]
+#     raise Exception(f"{gen} is not in GEN_TO_GEN map (see tools/constants.py)")
 
 def int2gen(i: int) -> str:
     """Maps intgers to generators
@@ -869,7 +869,8 @@ class TestMeta(Dataset):
             real_folder = "Orig/"
             fake_folder = "Gen/"
 
-            generators = os.listdir(path + fake_folder)
+            generators = [gen for gen in os.listdir(path + fake_folder) if not gen.startswith(".")]
+            print(generators)
 
             def extract_features(imgs):
                 with torch.no_grad():
