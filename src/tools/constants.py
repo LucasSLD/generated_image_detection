@@ -21,6 +21,8 @@ REAL_LABEL = 1
 FAKE_LABEL = 0
 PATH_TO_DATA = "/data3/AID/"
 REAL_IMG_GEN = "null"
+CLIP = "clip"
+DINO = "dino"
 # int -> generator name for model trained on the 18 classes from data3/AID
 INT_TO_GEN_DATA3 = {0: REAL_IMG_GEN,
                     1: 'miniDallEUP',

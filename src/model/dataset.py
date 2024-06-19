@@ -11,7 +11,7 @@ import os
 from PIL import Image
 import numpy as np
 from tqdm import tqdm
-from transformers import AutoImageProcessor, AutoModel
+from transformers import AutoImageProcessor, AutoModel, AutoImageProcessor, AutoModel
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from diffusers import DiffusionPipeline, StableDiffusionPipeline
 from compel import Compel, ReturnedEmbeddingsType
@@ -162,9 +162,9 @@ class DeepFakeDataset(Dataset): # data3/AID
                  balance_real_fake: bool=True,
                  device: str = device,
                  load_from_disk = False,
-                 feature_type: str = "clip"):
+                 feature_type: str = CLIP):
 
-        assert feature_type in ("clip","dino")
+        assert feature_type in (CLIP,DINO)
         
         if load_from_disk:
             data = torch.load(path_to_data)
@@ -177,10 +177,10 @@ class DeepFakeDataset(Dataset): # data3/AID
             self.gen_to_int = GEN_TO_INT
         else:
             if not path_to_data.endswith("/"): path_to_data += "/"
-            if feature_type == "clip":
+            if feature_type == CLIP:
                 model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
                 self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
-            elif feature_type == "dino":
+            elif feature_type == DINO:
                 processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
                 model = AutoModel.from_pretrained('facebook/dinov2-base')
                 model.to(device)
@@ -206,9 +206,9 @@ class DeepFakeDataset(Dataset): # data3/AID
 
             def extract_features(imgs: list, feature_type: str):
                 with torch.no_grad():
-                    if feature_type == "clip":
+                    if feature_type == CLIP:
                         features = model.encode_image(torch.cat(imgs,dim=0))
-                    elif feature_type == "dino":
+                    elif feature_type == DINO:
                         inputs = processor(images=imgs,return_tensors="pt")
                         features = model(inputs["pixel_values"].to(device))[1]
                 return features
@@ -218,9 +218,9 @@ class DeepFakeDataset(Dataset): # data3/AID
                 if i >= self.n_real:
                     break
                 img = Image.open(path_to_data + REAL_FOLDER_NAME + "/" + file)
-                if feature_type == "clip":
+                if feature_type == CLIP:
                     imgs.append(self.transform(img).unsqueeze(0).to(device))
-                elif feature_type == "dino":
+                elif feature_type == DINO:
                     imgs.append(img)
                 self.label.append(REAL_LABEL)
                 self.gen.append(gen2int(REAL_IMG_GEN))
@@ -247,9 +247,9 @@ class DeepFakeDataset(Dataset): # data3/AID
                     if i >= img_per_gen:
                         break
                     img = Image.open(path_to_data + gen + "/" + file)
-                    if feature_type == "clip":
+                    if feature_type == CLIP:
                         imgs.append(self.transform(img).unsqueeze(0).to(device))
-                    elif feature_type == "dino":
+                    elif feature_type == DINO:
                         imgs.append(img)
                     self.label.append(FAKE_LABEL)
                     self.gen.append(gen2int(gen))
@@ -591,14 +591,16 @@ class DeepFakeTest(Dataset): #/data3/AID_TEST
         "gen_original_name": self.gen_original_name}, output_path)
 
 
-class RealFakePairs(Dataset):
+class RealFakePairs(Dataset): #/data3/AID_pairs_orig_gen
     def __init__(self, 
                  path_to_real_imgs: str="",
                  path_to_fake_imgs: str="", 
                  img_per_class: int=1, 
                  device: str="cpu", 
                  load_from_disk: bool=False,
-                 path: str=""):
+                 path: str="",
+                 feature_type=CLIP):
+        assert feature_type in (CLIP,DINO)
         
         if not path_to_real_imgs.endswith("/"): path_to_real_imgs += "/"
         if not path_to_fake_imgs.endswith("/"): path_to_fake_imgs += "/"
@@ -613,34 +615,55 @@ class RealFakePairs(Dataset):
             # self.name     = data["name"] 
 
         else:
-            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            if feature_type == CLIP:
+                model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+                self.features = torch.empty((0,CLIP_FEATURE_DIM))
+            elif feature_type == DINO:
+                DINO_BATCH_SIZE = 100
+                processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
+                model = AutoModel.from_pretrained('facebook/dinov2-base').to(device)
+                self.features = torch.empty((0,DINO_FEATURE_DIM))
             model.eval()
 
             self.transform = self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
             real_imgs = [file for file in os.listdir(path_to_real_imgs) if file.endswith(".jpg")]
             fake_imgs = [file for file in os.listdir(path_to_fake_imgs) if file.endswith(".jpg")]
 
-            self.features = torch.empty((0,CLIP_FEATURE_DIM))
             self.label    = torch.empty(0)
             self.name     = []
 
-            def extract_features_from_files(files: list, path_to_folder: str, device: str) -> torch.Tensor:
-                preprocessed_imgs = []
-                for file in tqdm(files[:img_per_class],total=img_per_class):
-                    img = Image.open(path_to_folder + file)
-                    preprocessed_imgs.append(self.transform(img).unsqueeze(0).to(device))
-                    self.name.append(file)
-                with torch.no_grad():
-                    return model.encode_image(torch.cat(preprocessed_imgs,dim=0))
+            def extract_features_from_files(files: list, 
+                                            path_to_folder: str, 
+                                            device: str, 
+                                            feature_type=feature_type) -> torch.Tensor:
+                if feature_type == CLIP:
+                    preprocessed_imgs = []
+                    for file in tqdm(files[:img_per_class],total=img_per_class):
+                        img = Image.open(path_to_folder + file)
+                        preprocessed_imgs.append(self.transform(img).unsqueeze(0).to(device))
+                        self.name.append(file)
+                    with torch.no_grad():
+                        return model.encode_image(torch.cat(preprocessed_imgs,dim=0))
+                elif feature_type == DINO:
+                    outputs = []
+                    files = files[:img_per_class]
+                    self.name += [file for file in files]
+                    for i in tqdm(range(0,len(files),DINO_BATCH_SIZE),path_to_folder):
+                        imgs    = [Image.open(path_to_folder + file) for file in files[i:min(len(files),(i+DINO_BATCH_SIZE))]]
+                        inputs  = processor(images=imgs,return_tensors="pt")
+                        with torch.no_grad():
+                            outputs.append(model(inputs["pixel_values"].to(device))[1].cpu())
+                    return torch.cat(outputs,dim=0)
+
 
             # Real images
-            features = extract_features_from_files(real_imgs, path_to_real_imgs, device)
+            features = extract_features_from_files(real_imgs, path_to_real_imgs, device, feature_type)
             self.features = torch.cat((self.features,features.cpu()),dim=0)
             self.label    = torch.cat((self.label,REAL_LABEL * torch.ones(len(features))))
             torch.cuda.empty_cache()
 
             # Fake images
-            features = extract_features_from_files(fake_imgs, path_to_fake_imgs, device)
+            features = extract_features_from_files(fake_imgs, path_to_fake_imgs, device, feature_type)
             self.features = torch.cat((self.features, features.cpu()),dim=0)
             self.label    = torch.cat((self.label,FAKE_LABEL * torch.ones(len(features))))
             torch.cuda.empty_cache()
@@ -966,7 +989,8 @@ class FlickrAndPairs(Dataset): # mix of data from real_fake_pairs and Flickr + g
     def __init__(self,
                  path: str="",
                  load_from_disk: bool=False,
-                 device: str="cpu"):
+                 device: str="cpu",
+                 feature_type: str=CLIP):
         
         if load_from_disk:
             data = torch.load(path)
@@ -975,23 +999,38 @@ class FlickrAndPairs(Dataset): # mix of data from real_fake_pairs and Flickr + g
         else:
             pairs_data = RealFakePairs(device=device,
                                        load_from_disk=True,
-                                       path="/data4/saland/data/real_fake_pairs_1000_name.pt")
+                                       path="/data4/saland/data/real_fake_pairs_1000_name_DinoV2.pt")
 
             self.features = pairs_data.features
             self.label    = pairs_data.label
             
-            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            if feature_type == CLIP:
+                model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)  
+            elif feature_type == DINO:
+                DINO_BATCH_SIZE = 100
+                processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
+                model = AutoModel.from_pretrained('facebook/dinov2-base').to(device)
+            
             model.eval()
 
             self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
 
             def extract_features_from_files(files, path: str):
-                imgs = []
-                for file in tqdm(files,path):
-                    img = Image.open(path + file)
-                    imgs.append(self.transform(img).unsqueeze(0).to(device))
-                with torch.no_grad():
-                    return model.encode_image(torch.cat(imgs,dim=0))
+                if feature_type == CLIP:
+                    imgs = []
+                    for file in tqdm(files,path):
+                        img = Image.open(path + file)
+                        imgs.append(self.transform(img).unsqueeze(0).to(device))
+                    with torch.no_grad():
+                        return model.encode_image(torch.cat(imgs,dim=0))
+                elif feature_type == DINO:
+                    outputs = []
+                    for i in tqdm(range(0,len(files),DINO_BATCH_SIZE),path):
+                        imgs    = [Image.open(path + file) for file in files[i:min(len(files),(i+DINO_BATCH_SIZE))]]
+                        inputs  = processor(images=imgs,return_tensors="pt")
+                        with torch.no_grad():
+                            outputs.append(model(inputs["pixel_values"].to(device))[1].cpu())
+                    return torch.cat(outputs,dim=0)
 
             path_to_flickr = "/data4/saland/data/2k_real_2k_fake/Flickr/"
 
@@ -1068,3 +1107,10 @@ class TaskA(Dataset):
     
     def save(self, output_path: str):
         torch.save({"features":self.features,"image_name":self.image_name},output_path)
+
+
+class RealFake2K_DinoV2(Dataset):
+    def __init__(self):
+        processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
+        model = AutoModel.from_pretrained('facebook/dinov2-base')
+        model.eval()
