@@ -1073,7 +1073,7 @@ class FlickrAndPairs(Dataset): # mix of data from real_fake_pairs and Flickr + g
     def save(self, output_path: str):
         torch.save({"features":self.features,"label":self.label},output_path)
 
-class TaskA(Dataset):
+class TaskA(Dataset): # /data3/TEST/A
     def __init__(self, load_from_disk: bool, path: str="" ,device: str="cpu"):
         self.dir_name = "/data3/TEST/A/"
         
