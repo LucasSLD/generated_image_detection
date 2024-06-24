@@ -23,6 +23,7 @@ PATH_TO_DATA = "/data3/AID/"
 REAL_IMG_GEN = "null"
 CLIP = "clip"
 DINO = "dino"
+DINO_BATCH_SIZE = 100 # max number of images processed at once
 # int -> generator name for model trained on the 18 classes from data3/AID
 INT_TO_GEN_DATA3 = {0: REAL_IMG_GEN,
                     1: 'miniDallEUP',
