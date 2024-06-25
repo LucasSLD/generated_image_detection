@@ -1118,14 +1118,14 @@ class TaskA(Dataset): # /data3/TEST/A
 
 class TaskAWithLabel(Dataset):
     def __init__(self, path_to_csv: str, path_to_taskA: str):
-        n = 3333
-        data_csv = pd.read_csv(path_to_csv).iloc[:n] # I only labeled 3333 images
+        data_csv = pd.read_csv(path_to_csv)
         data = TaskA(load_from_disk=True,path=path_to_taskA)
 
         self.features = []
         self.label = []
+        self.features_dict = {}
 
-        for name in tqdm(sorted(data.image_name)[:n]):
+        for name in tqdm(sorted(data.image_name)):
             self.features.append(data.features[name])
             self.label.append(1 - data_csv[data_csv["image_name"] == name]["class"].item()) # labels in csv are reversed
 
