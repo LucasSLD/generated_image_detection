@@ -846,7 +846,8 @@ class TestMeta(Dataset):
     def __init__(self,
                  path: str="/data3/test_meta_learning/",
                  load_from_disk:bool = False,
-                 device: str="cpu"):
+                 device: str="cpu",
+                 feature_type: str=CLIP):
         
         if load_from_disk:
             data = torch.load(path)
@@ -869,25 +870,42 @@ class TestMeta(Dataset):
 
             qualities = (40, 65, 90, 100)
 
-            self.transform = {
-                40: lambda img : preprocess(Image.fromarray(transform_40(image=np.asarray(img.convert("RGB")))["image"])),
-                65: lambda img : preprocess(Image.fromarray(transform_65(image=np.asarray(img.convert("RGB")))["image"])),
-                90: lambda img : preprocess(Image.fromarray(transform_90(image=np.asarray(img.convert("RGB")))["image"])),
-                100: lambda img : preprocess(Image.fromarray(transform_100(image=np.asarray(img.convert("RGB")))["image"]))}
-
-            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            if feature_type == CLIP:
+                model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+                self.transform = {
+                    40: lambda img : preprocess(Image.fromarray(transform_40(image=np.asarray(img.convert("RGB")))["image"])),
+                    65: lambda img : preprocess(Image.fromarray(transform_65(image=np.asarray(img.convert("RGB")))["image"])),
+                    90: lambda img : preprocess(Image.fromarray(transform_90(image=np.asarray(img.convert("RGB")))["image"])),
+                    100: lambda img : preprocess(Image.fromarray(transform_100(image=np.asarray(img.convert("RGB")))["image"]))}
+            elif feature_type == DINO:
+                processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
+                model = AutoModel.from_pretrained('facebook/dinov2-base').to(device)
+                self.transform = {
+                    40: lambda img : Image.fromarray(transform_40(image=np.asarray(img.convert("RGB")))["image"]),
+                    65: lambda img : Image.fromarray(transform_65(image=np.asarray(img.convert("RGB")))["image"]),
+                    90: lambda img : Image.fromarray(transform_90(image=np.asarray(img.convert("RGB")))["image"]),
+                    100: lambda img : Image.fromarray(transform_100(image=np.asarray(img.convert("RGB")))["image"])}
+                
             model.eval()
 
             real_folder = "Orig/"
             fake_folder = "Gen/"
 
             generators = [gen for gen in os.listdir(path + fake_folder) if not gen.startswith(".")]
-            print(generators)
+
 
             def extract_features(imgs):
                 with torch.no_grad():
-                    features = model.encode_image(torch.cat(imgs,dim=0))
-                return features
+                    if feature_type == CLIP:
+                        return model.encode_image(torch.cat(imgs,dim=0))
+                    elif feature_type == DINO:
+                        outputs = []
+                        for i in tqdm(range(0,len(imgs),DINO_BATCH_SIZE)):
+                            imgs_batch = imgs[i:min(len(imgs),i+DINO_BATCH_SIZE)]
+                            inputs  = processor(images=imgs_batch,return_tensors="pt")
+                            with torch.no_grad():
+                                outputs.append(model(inputs["pixel_values"].to(device))[1].cpu())
+                        return torch.cat(outputs,dim=0)
 
             for gen in generators:
                 files = [file for file in os.listdir(path + fake_folder + gen) if file.endswith("jpg") or 
@@ -898,7 +916,10 @@ class TestMeta(Dataset):
                     for file in tqdm(files,str(gen)):
                         name = path + fake_folder + gen + "/" + file
                         img = Image.open(name)
-                        imgs.append(self.transform[q](img).unsqueeze(0).to(device))
+                        if feature_type == CLIP:
+                            imgs.append(self.transform[q](img).unsqueeze(0).to(device))
+                        elif feature_type == DINO:
+                            imgs.append(self.transform[q](img))
 
                         self.label.append(FAKE_LABEL)
                         self.gen.append(gen2int(gen))
@@ -929,7 +950,10 @@ class TestMeta(Dataset):
                     for file in tqdm(files,str(subfolder)):
                         name = path + real_folder + subfolder + "/" + file
                         img = Image.open(name)
-                        imgs.append(self.transform[q](img).unsqueeze(0).to(device))
+                        if feature_type == CLIP:
+                            imgs.append(self.transform[q](img).unsqueeze(0).to(device))
+                        elif feature_type == DINO:
+                            imgs.append(self.transform[q](img))
 
                         self.label.append(REAL_LABEL)
                         self.gen.append(gen2int(REAL_IMG_GEN))
