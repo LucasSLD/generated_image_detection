@@ -361,7 +361,8 @@ class OOD(Dataset):
                  device: str=device,
                  gen_to_int: dict=GEN_TO_INT_OOD,
                  int_to_gen: dict=INT_TO_GEN_OOD,
-                 remove_blacklisted_gen: bool=False):
+                 remove_blacklisted_gen: bool=False,
+                 feature_type=CLIP):
         if load_preprocessed:
             data = torch.load(path_to_data,device)
             self.gen_to_int = data["gen_to_int"] 
@@ -393,9 +394,15 @@ class OOD(Dataset):
             self.int_to_gen = int_to_gen
             self.int_to_label = {FAKE_LABEL: "fake", REAL_LABEL: "real"} 
             self.label_to_int = {"fake":FAKE_LABEL,"real":REAL_LABEL}
-            self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
             
-            model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+            if feature_type == CLIP:
+                model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
+                self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+            elif feature_type == DINO:
+                processor = AutoImageProcessor.from_pretrained('facebook/dinov2-base')
+                model = AutoModel.from_pretrained('facebook/dinov2-base').to(device)
+                self.transform = lambda img : Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"])
+
             model.eval()
             
             REAL_IMG_PATH = path_to_data + "real_images/"
@@ -404,9 +411,14 @@ class OOD(Dataset):
             real_files = os.listdir(REAL_IMG_PATH)
             
             #================================= Real images processing =================================#
-            real_imgs = [self.transform(Image.open(REAL_IMG_PATH + file)).unsqueeze(0).to(device) for file in tqdm(real_files,"Processing real images")]
             with torch.no_grad():
-                features = model.encode_image(torch.cat(real_imgs,dim=0))
+                if feature_type == CLIP:
+                    real_imgs = [self.transform(Image.open(REAL_IMG_PATH + file)).unsqueeze(0).to(device) for file in tqdm(real_files,"Processing real images")]
+                    features = model.encode_image(torch.cat(real_imgs,dim=0))
+                elif feature_type == DINO:
+                    real_imgs = [self.transform(Image.open(REAL_IMG_PATH + file)) for file in tqdm(real_files, "Processing real files")]
+                    inputs = processor(images=real_imgs,return_tensors="pt")
+                    features = torch.cat(model(inputs["pixel_values"].to(device))[1].cpu(),dim=0)
             self.features = torch.cat((self.features,features.cpu()),dim=0)
             self.label = torch.cat((self.label,torch.Tensor(len(real_imgs) * [REAL_LABEL])),dim=0)
             self.gen = torch.cat((self.gen,torch.ones(len(real_imgs)) * self.gen_to_int[REAL_IMG_GEN]),dim=0)
@@ -415,10 +427,10 @@ class OOD(Dataset):
             gen_folder = ['Lexica_images',
                           'Ideogram_images',
                           'Leonardo_images',
-                          'Copilot_images',
-                          'img2img_SD1.5_images',
-                          'Photoshop_images_generativemagnification',
-                          'Photoshop_images_generativefill']
+                          'Copilot_images']#,
+                        #   'img2img_SD1.5_images', # this folders are blacklisted
+                        #   'Photoshop_images_generativemagnification',
+                        #   'Photoshop_images_generativefill']
             
             generators = ['Lexica',
                           'Ideogram',
@@ -434,9 +446,18 @@ class OOD(Dataset):
                 
                 for file in tqdm(os.listdir(FAKE_IMG_PATH + gen),desc=desc):
                     img = Image.open(FAKE_IMG_PATH + gen + "/" + file)
-                    fake_imgs.append(self.transform(img).unsqueeze(0).to(device))
+                    if feature_type == CLIP:
+                        fake_imgs.append(self.transform(img).unsqueeze(0).to(device))
+                    elif feature_type == DINO:
+                        fake_imgs.append(self.transform(img))
                 with torch.no_grad():
-                    features = model.encode_image(torch.cat(fake_imgs,dim=0))
+                    if feature_type == CLIP:
+                        features = model.encode_image(torch.cat(fake_imgs,dim=0))
+                    elif feature_type == DINO:
+                        inputs = processor(images=fake_imgs,return_tensors="pt")
+                        outputs = model(inputs["pixel_values"].to(device)[1].cpu())
+                        features = torch.cat(outputs,dim=0)
+
                 self.features = torch.cat((self.features,features.cpu()),dim=0)
                 self.label = torch.cat((self.label,torch.Tensor(len(fake_imgs) * [FAKE_LABEL])),dim=0)
                 self.gen = torch.cat((self.gen,torch.Tensor(len(fake_imgs) * [self.gen_to_int[generators[i]]])),dim=0)
