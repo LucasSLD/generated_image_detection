@@ -1196,3 +1196,4 @@ class SimpleDataset(Dataset):
     
     def __getitem__(self, index: int):
         return {"features":self.features[index], "label": self.label[index]}
+        
