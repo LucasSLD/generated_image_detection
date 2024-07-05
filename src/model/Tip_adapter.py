@@ -12,6 +12,7 @@ from PIL import Image
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import Dataset
+import torch.nn as nn
 
 class TipAdapter(nn.Module): 
     """ 
@@ -34,7 +35,8 @@ class TipAdapter(nn.Module):
         self.F_train = torch.cat((features_fake[:img_per_class],features_real[:img_per_class]))
         self.F_train = self.F_train / torch.linalg.vector_norm(self.F_train,dim=1,keepdim=True)
         self.F_train = self.F_train.to(device)
-        # print(torch.linalg.vector_norm(self.F_train,dim=-1,keepdim=True))
+        self.F_train = nn.Parameter(self.F_train)
+
         self.L_train = [torch.Tensor([1, 0]) for i in range(img_per_class)] # fake label one hot encoding
         self.L_train += [torch.Tensor([0, 1]) for i in range(img_per_class)] # real label encoding
         self.L_train = torch.stack(self.L_train).type(torch.LongTensor).to(device)
@@ -42,7 +44,7 @@ class TipAdapter(nn.Module):
         model,_ , preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
         model.eval()
 
-        tokens =  tokenizer.tokenize(["a" + label + "image" for label in ("generated","real")])
+        tokens =  tokenizer.tokenize(["a" + label + "image" for label in ("generated","real")]).to(device)
         with torch.no_grad():
             self.Wc = model.encode_text(tokens)
         self.Wc /= torch.linalg.vector_norm(self.Wc,dim=-1,keepdim=True)
