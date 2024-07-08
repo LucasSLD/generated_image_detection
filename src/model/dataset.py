@@ -1168,11 +1168,13 @@ class TaskAWithLabel(Dataset):
 
         self.features = []
         self.label = []
+        self.name = []
         self.features_dict = {}
 
         for name in tqdm(sorted(data.image_name)):
             self.features.append(data.features[name])
             self.label.append(1 - data_csv[data_csv["image_name"] == name]["class"].item()) # labels in csv are reversed
+            self.name.append(name)
 
         self.features = torch.cat(self.features,dim=0)
         self.label = torch.Tensor(self.label).type(torch.LongTensor)
@@ -1181,10 +1183,10 @@ class TaskAWithLabel(Dataset):
         return len(self.label)
     
     def __getitem__(self, index):
-        return {"features":self.features[index],"label":self.label[index]}
+        return {"features":self.features[index],"label":self.label[index],"name":self.name[index]}
     
     def save(self, output_path: str):
-        torch.save({"features":self.features,"label":self.label},output_path)
+        torch.save({"features":self.features,"label":self.label,"name":self.name},output_path)
 
 class SimpleDataset(Dataset):
     def __init__(self, features: torch.Tensor, label: torch.Tensor):
