@@ -59,7 +59,8 @@ class MultiClassClassifier(nn.Module):
         return labels
 
     def predict_classes(self, features, device: str):
-        """Predict the generators associated to the given features. See MultiClassClassifier.int_to_gen to see the mapping between integer values and generators' name.
+        """Predict the generators associated to the given features. 
+        See MultiClassClassifier.int_to_gen to see the mapping between integer values and generators' name.
 
         Args:
             features (_type_): (n_rows,n_features) tensor
