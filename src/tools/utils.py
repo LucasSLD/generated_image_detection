@@ -18,14 +18,14 @@ from constants import REAL_LABEL, FAKE_LABEL, REAL_IMG_GEN
 
 to_tensor = transforms.ToTensor()
 
-def plot_np_array(img_numpy_array, title : str = None, colorbar=False,figsize=None):
+def plot_np_array(img_numpy_array, title : str = None, colorbar=False,figsize=None,cmap=None):
     if figsize is not None: plt.figure(figsize=figsize)
     if title is not None: plt.title(title)
     plt.tick_params(left = False, right = False , labelleft = False , labelbottom = False, bottom = False) 
-    plt.imshow(img_numpy_array)
+    plt.imshow(img_numpy_array,cmap=cmap)
     if colorbar: plt.colorbar()
 
-def plot_tensor(tensor, title : str = None, colorbar=False,figsize=None):
+def plot_tensor(tensor, title : str = None, colorbar=False,figsize=None,cmap=None):
     """Plots a tensor image
 
     Args:
@@ -44,7 +44,7 @@ def plot_tensor(tensor, title : str = None, colorbar=False,figsize=None):
     plot_np_array(array, title, colorbar, figsize)
 
 def plot_pil_img(img, title: str = None, figsize = None):
-    plot_np_array(np.asarray(img),title=title,figsize=figsize)
+    plot_np_array(np.asarray(img),title=title,figsize=figsize,cmap=cmap)
     plt.show()
 
 def img_from_url(url: str):
