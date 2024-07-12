@@ -41,9 +41,9 @@ def plot_tensor(tensor, title : str = None, colorbar=False,figsize=None,cmap=Non
     else:
         print("ShapeError: the input array should be 3D or 4D")
         return
-    plot_np_array(array, title, colorbar, figsize)
+    plot_np_array(array, title, colorbar, figsize, cmap)
 
-def plot_pil_img(img, title: str = None, figsize = None):
+def plot_pil_img(img, title: str = None, figsize = None, cmap=None):
     plot_np_array(np.asarray(img),title=title,figsize=figsize,cmap=cmap)
     plt.show()
 
