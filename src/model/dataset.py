@@ -1018,7 +1018,8 @@ class TestMeta(Dataset):
             "folder": self.folder,
             "quality":self.quality,
             "gen_original_name": self.gen_original_name}, output_path)
-        
+
+
 class FlickrAndPairs(Dataset): # mix of data from real_fake_pairs and Flickr + generated images from AID
     def __init__(self,
                  path: str="",
@@ -1108,6 +1109,7 @@ class FlickrAndPairs(Dataset): # mix of data from real_fake_pairs and Flickr + g
     def save(self, output_path: str):
         torch.save({"features":self.features,"label":self.label},output_path)
 
+
 class TaskA(Dataset): # /data3/TEST/A
     def __init__(self, 
                  load_from_disk: bool, 
@@ -1187,6 +1189,7 @@ class TaskAWithLabel(Dataset):
     
     def save(self, output_path: str):
         torch.save({"features":self.features,"label":self.label,"name":self.name},output_path)
+
 
 class SimpleDataset(Dataset):
     def __init__(self, features: torch.Tensor, label: torch.Tensor):
