@@ -830,7 +830,7 @@ class LongCaption(Dataset):
             model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:laion/CLIP-ViT-L-14-DataComp.XL-s13B-b90K',device=device)
             model.eval()
 
-            self.transform = self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
+            self.transform = lambda img : preprocess(Image.fromarray(transform_torch(image=np.asarray(img.convert("RGB")))["image"]))
 
             def extract_features_from_files(files: list, path_to_folder: str, device: str) -> torch.Tensor:
                     preprocessed_imgs = []
