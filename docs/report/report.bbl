@@ -1,0 +1,458 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{cozzolinoRaisingBarAIgenerated2024}{online}{}
+      \name{author}{5}{}{%
+        {{hash=c1ecf43c4cd245ac59bfa7f790dc5fdf}{%
+           family={Cozzolino},
+           familyi={C\bibinitperiod},
+           given={Davide},
+           giveni={D\bibinitperiod}}}%
+        {{hash=b8a4ccb499371daaf433f3da22955547}{%
+           family={Poggi},
+           familyi={P\bibinitperiod},
+           given={Giovanni},
+           giveni={G\bibinitperiod}}}%
+        {{hash=5adf5258b1288682a2c826337584cb8e}{%
+           family={Corvi},
+           familyi={C\bibinitperiod},
+           given={Riccardo},
+           giveni={R\bibinitperiod}}}%
+        {{hash=3e07f51dbc36ece3b41bb5bcfe5b3b07}{%
+           family={Nießner},
+           familyi={N\bibinitperiod},
+           given={Matthias},
+           giveni={M\bibinitperiod}}}%
+        {{hash=23f92e2e6ddd37aaf46d9abd37a37fa1}{%
+           family={Verdoliva},
+           familyi={V\bibinitperiod},
+           given={Luisa},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{f9f4524f625ab795fc8b0849b96ebf66}
+      \strng{fullhash}{e41892c6cc98548e565ca4fc5877cec1}
+      \strng{bibnamehash}{f9f4524f625ab795fc8b0849b96ebf66}
+      \strng{authorbibnamehash}{f9f4524f625ab795fc8b0849b96ebf66}
+      \strng{authornamehash}{f9f4524f625ab795fc8b0849b96ebf66}
+      \strng{authorfullhash}{e41892c6cc98548e565ca4fc5877cec1}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The aim of this work is to explore the potential of pre-trained vision-language models (VLMs) for universal detection of AI-generated images. We develop a lightweight detection strategy based on CLIP features and study its performance in a wide variety of challenging scenarios. We find that, contrary to previous beliefs, it is neither necessary nor convenient to use a large domain-specific dataset for training. On the contrary, by using only a handful of example images from a single generative model, a CLIP-based detector exhibits surprising generalization ability and high robustness across different architectures, including recent commercial tools such as Dalle-3, Midjourney v5, and Firefly. We match the state-of-the-art (SoTA) on in-distribution data and significantly improve upon it in terms of generalization to out-of-distribution data (+6\% AUC) and robustness to impaired/laundered data (+13\%). Our project is available at https://grip-unina.github.io/ClipBased-SyntheticImageDetection/}
+      \field{day}{29}
+      \field{eprintclass}{cs}
+      \field{eprinttype}{arXiv}
+      \field{langid}{english}
+      \field{month}{4}
+      \field{pubstate}{prepublished}
+      \field{title}{Raising the {{Bar}} of {{AI-generated Image Detection}} with {{CLIP}}}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \verb{eprint}
+      \verb 2312.00195
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/Z658GM5C/Cozzolino et al. - 2024 - Raising the Bar of AI-generated Image Detection wi.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2312.00195
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2312.00195
+      \endverb
+      \keyw{Computer Science - Computer Vision and Pattern Recognition}
+    \endentry
+    \entry{goodfellowGenerativeAdversarialNetworks2014}{online}{}
+      \name{author}{8}{}{%
+        {{hash=d4f74ef4c79f3bb1e51e378184d8850e}{%
+           family={Goodfellow},
+           familyi={G\bibinitperiod},
+           given={Ian\bibnamedelima J.},
+           giveni={I\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=a341d25f80a8118cdbb90b272adc8b4f}{%
+           family={Pouget-Abadie},
+           familyi={P\bibinithyphendelim A\bibinitperiod},
+           given={Jean},
+           giveni={J\bibinitperiod}}}%
+        {{hash=9e80f4779b032f68a6106e1424345450}{%
+           family={Mirza},
+           familyi={M\bibinitperiod},
+           given={Mehdi},
+           giveni={M\bibinitperiod}}}%
+        {{hash=743dd6cdaa6639320289d219d351d7b7}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Bing},
+           giveni={B\bibinitperiod}}}%
+        {{hash=e8151f1b8f85a048cacb34f374ec922b}{%
+           family={Warde-Farley},
+           familyi={W\bibinithyphendelim F\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=9ca00ffd7cc35f7cfb8f698aa9239c76}{%
+           family={Ozair},
+           familyi={O\bibinitperiod},
+           given={Sherjil},
+           giveni={S\bibinitperiod}}}%
+        {{hash=ccec1ccd2e1aa86960eb2e872c6b7020}{%
+           family={Courville},
+           familyi={C\bibinitperiod},
+           given={Aaron},
+           giveni={A\bibinitperiod}}}%
+        {{hash=40a8e4774982146adc2688546f54efb2}{%
+           family={Bengio},
+           familyi={B\bibinitperiod},
+           given={Yoshua},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{8b5c7065f4df4f81627df9460343f166}
+      \strng{fullhash}{5afe3eb3246d0b46f32cdc5ff3e9d6b8}
+      \strng{bibnamehash}{8b5c7065f4df4f81627df9460343f166}
+      \strng{authorbibnamehash}{8b5c7065f4df4f81627df9460343f166}
+      \strng{authornamehash}{8b5c7065f4df4f81627df9460343f166}
+      \strng{authorfullhash}{5afe3eb3246d0b46f32cdc5ff3e9d6b8}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{We propose a new framework for estimating generative models via an adversarial process, in which we simultaneously train two models: a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G. The training procedure for G is to maximize the probability of D making a mistake. This framework corresponds to a minimax two-player game. In the space of arbitrary functions G and D, a unique solution exists, with G recovering the training data distribution and D equal to 1/2 everywhere. In the case where G and D are defined by multilayer perceptrons, the entire system can be trained with backpropagation. There is no need for any Markov chains or unrolled approximate inference networks during either training or generation of samples. Experiments demonstrate the potential of the framework through qualitative and quantitative evaluation of the generated samples.}
+      \field{day}{10}
+      \field{eprintclass}{cs, stat}
+      \field{eprinttype}{arXiv}
+      \field{langid}{english}
+      \field{month}{6}
+      \field{pubstate}{prepublished}
+      \field{title}{Generative {{Adversarial Networks}}}
+      \field{year}{2014}
+      \field{dateera}{ce}
+      \verb{eprint}
+      \verb 1406.2661
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/DWN9GVNR/Goodfellow et al. - 2014 - Generative Adversarial Networks.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/1406.2661
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/1406.2661
+      \endverb
+      \keyw{Computer Science - Machine Learning,Statistics - Machine Learning}
+    \endentry
+    \entry{khanCLIPpingDeceptionAdapting2024}{online}{}
+      \name{author}{2}{}{%
+        {{hash=1e25f016b4fdb7e2dd8c6098754c9973}{%
+           family={Khan},
+           familyi={K\bibinitperiod},
+           given={Sohail\bibnamedelima Ahmed},
+           giveni={S\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=48524bcc05150e37521b34d51e0a9644}{%
+           family={Dang-Nguyen},
+           familyi={D\bibinithyphendelim N\bibinitperiod},
+           given={Duc-Tien},
+           giveni={D\bibinithyphendelim T\bibinitperiod}}}%
+      }
+      \strng{namehash}{4edc7a2adcfb6b80152905cc23ddaa32}
+      \strng{fullhash}{4edc7a2adcfb6b80152905cc23ddaa32}
+      \strng{bibnamehash}{4edc7a2adcfb6b80152905cc23ddaa32}
+      \strng{authorbibnamehash}{4edc7a2adcfb6b80152905cc23ddaa32}
+      \strng{authornamehash}{4edc7a2adcfb6b80152905cc23ddaa32}
+      \strng{authorfullhash}{4edc7a2adcfb6b80152905cc23ddaa32}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{The recent advancements in Generative Adversarial Networks (GANs) and the emergence of Diffusion models have significantly streamlined the production of highly realistic and widely accessible synthetic content. As a result, there is a pressing need for effective general purpose detection mechanisms to mitigate the potential risks posed by deepfakes. In this paper, we explore the effectiveness of pre-trained vision-language models (VLMs) when paired with recent adaptation methods for universal deepfake detection. Following previous studies in this domain, we employ only a single dataset (ProGAN) in order to adapt CLIP for deepfake detection. However, in contrast to prior research, which rely solely on the visual part of CLIP while ignoring its textual component, our analysis reveals that retaining the text part is crucial. Consequently, the simple and lightweight Prompt Tuning based adaptation strategy that we employ outperforms the previous SOTA approach by 5.01\% mAP and 6.61\% accuracy while utilizing less than one third of the training data (200k images as compared to 720k). To assess the real-world applicability of our proposed models, we conduct a comprehensive evaluation across various scenarios. This involves rigorous testing on images sourced from 21 distinct datasets, including those generated by GANs-based, Diffusion-based and Commercial tools.}
+      \field{day}{20}
+      \field{eprintclass}{cs}
+      \field{eprinttype}{arXiv}
+      \field{langid}{english}
+      \field{month}{2}
+      \field{pubstate}{prepublished}
+      \field{shorttitle}{{{CLIPping}} the {{Deception}}}
+      \field{title}{{{CLIPping}} the {{Deception}}: {{Adapting Vision-Language Models}} for {{Universal Deepfake Detection}}}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \verb{eprint}
+      \verb 2402.12927
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/XXP7JHP6/Khan and Dang-Nguyen - 2024 - CLIPping the Deception Adapting Vision-Language M.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2402.12927
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2402.12927
+      \endverb
+      \keyw{Computer Science - Computer Vision and Pattern Recognition}
+    \endentry
+    \entry{oquabDINOv2LearningRobust2024}{online}{}
+      \name{author}{26}{}{%
+        {{hash=837bdf8ff88db746f81a2e1284a60422}{%
+           family={Oquab},
+           familyi={O\bibinitperiod},
+           given={Maxime},
+           giveni={M\bibinitperiod}}}%
+        {{hash=c7aaaf1f5fc651003103cdbeca6243a5}{%
+           family={Darcet},
+           familyi={D\bibinitperiod},
+           given={Timothée},
+           giveni={T\bibinitperiod}}}%
+        {{hash=e5f418be9295a0b058f1a4241bf11a49}{%
+           family={Moutakanni},
+           familyi={M\bibinitperiod},
+           given={Théo},
+           giveni={T\bibinitperiod}}}%
+        {{hash=cd6e2699b7bedd76aeed8613ed078015}{%
+           family={Vo},
+           familyi={V\bibinitperiod},
+           given={Huy},
+           giveni={H\bibinitperiod}}}%
+        {{hash=5b93cc67d00372e1b5b40bfa6e60eb53}{%
+           family={Szafraniec},
+           familyi={S\bibinitperiod},
+           given={Marc},
+           giveni={M\bibinitperiod}}}%
+        {{hash=5dc4b47031c8b2907cad670adafdeed4}{%
+           family={Khalidov},
+           familyi={K\bibinitperiod},
+           given={Vasil},
+           giveni={V\bibinitperiod}}}%
+        {{hash=f4329de85325465dd871adf4af9a1903}{%
+           family={Fernandez},
+           familyi={F\bibinitperiod},
+           given={Pierre},
+           giveni={P\bibinitperiod}}}%
+        {{hash=e95875c24fa3832f61892aeb77b3adc7}{%
+           family={Haziza},
+           familyi={H\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=e5dfae4582081d649e3a0d5342050016}{%
+           family={Massa},
+           familyi={M\bibinitperiod},
+           given={Francisco},
+           giveni={F\bibinitperiod}}}%
+        {{hash=25ec75200061b14f2e37b3872b718180}{%
+           family={El-Nouby},
+           familyi={E\bibinithyphendelim N\bibinitperiod},
+           given={Alaaeldin},
+           giveni={A\bibinitperiod}}}%
+        {{hash=76f1284ebdfc9de8a8c55e414874a573}{%
+           family={Assran},
+           familyi={A\bibinitperiod},
+           given={Mahmoud},
+           giveni={M\bibinitperiod}}}%
+        {{hash=088c8a878ffb450444f0e6a8aa932e4b}{%
+           family={Ballas},
+           familyi={B\bibinitperiod},
+           given={Nicolas},
+           giveni={N\bibinitperiod}}}%
+        {{hash=7357b6b83486371ca1a49ef623c1bafd}{%
+           family={Galuba},
+           familyi={G\bibinitperiod},
+           given={Wojciech},
+           giveni={W\bibinitperiod}}}%
+        {{hash=4084390fbaaaa5bf84b379c367a97e4e}{%
+           family={Howes},
+           familyi={H\bibinitperiod},
+           given={Russell},
+           giveni={R\bibinitperiod}}}%
+        {{hash=0c155d6dd75feaae111ee0eaf65d5f4f}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Po-Yao},
+           giveni={P\bibinithyphendelim Y\bibinitperiod}}}%
+        {{hash=1dfde7074e14b11b54a8dcc9fd4a23e9}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Shang-Wen},
+           giveni={S\bibinithyphendelim W\bibinitperiod}}}%
+        {{hash=4ada721a93e1592ecdc3df0fc9876469}{%
+           family={Misra},
+           familyi={M\bibinitperiod},
+           given={Ishan},
+           giveni={I\bibinitperiod}}}%
+        {{hash=16922b89cdf492fe3becb64ab59c075a}{%
+           family={Rabbat},
+           familyi={R\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=a46d43967e346a69e0e9120b46b66ec1}{%
+           family={Sharma},
+           familyi={S\bibinitperiod},
+           given={Vasu},
+           giveni={V\bibinitperiod}}}%
+        {{hash=a345e20a460089c920bb74098ed450db}{%
+           family={Synnaeve},
+           familyi={S\bibinitperiod},
+           given={Gabriel},
+           giveni={G\bibinitperiod}}}%
+        {{hash=e33632a7cd83c6e486ccbe7fd081f315}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Hu},
+           giveni={H\bibinitperiod}}}%
+        {{hash=2c7a40c14da4e2dbb4991d259899e6f6}{%
+           family={Jegou},
+           familyi={J\bibinitperiod},
+           given={Hervé},
+           giveni={H\bibinitperiod}}}%
+        {{hash=d699b6cdc55cf5811dd19c9a2e13c7c1}{%
+           family={Mairal},
+           familyi={M\bibinitperiod},
+           given={Julien},
+           giveni={J\bibinitperiod}}}%
+        {{hash=32abf16ecae82238c88857c56ce1a663}{%
+           family={Labatut},
+           familyi={L\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod}}}%
+        {{hash=977d047821122d1c2e7aa855c30c8cf2}{%
+           family={Joulin},
+           familyi={J\bibinitperiod},
+           given={Armand},
+           giveni={A\bibinitperiod}}}%
+        {{hash=dfd2b635b41689b48c4b81ce769b940b}{%
+           family={Bojanowski},
+           familyi={B\bibinitperiod},
+           given={Piotr},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{618ed95633c96d24beb38093a078f50c}
+      \strng{fullhash}{7bbaddf2b6aadfba770de277eaf46687}
+      \strng{bibnamehash}{618ed95633c96d24beb38093a078f50c}
+      \strng{authorbibnamehash}{618ed95633c96d24beb38093a078f50c}
+      \strng{authornamehash}{618ed95633c96d24beb38093a078f50c}
+      \strng{authorfullhash}{7bbaddf2b6aadfba770de277eaf46687}
+      \field{sortinit}{O}
+      \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{The recent breakthroughs in natural language processing for model pretraining on large quantities of data have opened the way for similar foundation models in computer vision. These models could greatly simplify the use of images in any system by producing generalpurpose visual features, i.e., features that work across image distributions and tasks without finetuning. This work shows that existing pretraining methods, especially self-supervised methods, can produce such features if trained on enough curated data from diverse sources. We revisit existing approaches and combine different techniques to scale our pretraining in terms of data and model size. Most of the technical contributions aim at accelerating and stabilizing the training at scale. In terms of data, we propose an automatic pipeline to build a dedicated, diverse, and curated image dataset instead of uncurated data, as typically done in the self-supervised literature. In terms of models, we train a ViT model (Dosovitskiy et al., 2021) with 1B parameters and distill it into a series of smaller models that surpass the best available general-purpose features, OpenCLIP (Ilharco et al., 2021) on most of the benchmarks at image and pixel levels.}
+      \field{day}{2}
+      \field{eprintclass}{cs}
+      \field{eprinttype}{arXiv}
+      \field{langid}{english}
+      \field{month}{2}
+      \field{pubstate}{prepublished}
+      \field{shorttitle}{{{DINOv2}}}
+      \field{title}{{{DINOv2}}: {{Learning Robust Visual Features}} without {{Supervision}}}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \verb{eprint}
+      \verb 2304.07193
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/HP9TIX4J/Oquab et al. - 2024 - DINOv2 Learning Robust Visual Features without Su.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2304.07193
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2304.07193
+      \endverb
+      \keyw{Computer Science - Computer Vision and Pattern Recognition}
+    \endentry
+    \entry{zhangTipAdapterTrainingfreeAdaption2022}{online}{}
+      \name{author}{8}{}{%
+        {{hash=d6ca1cfc0836fd55195a73f2e243ab60}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Renrui},
+           giveni={R\bibinitperiod}}}%
+        {{hash=d5bf873f27cd02d00ee08830379abeb4}{%
+           family={Wei},
+           familyi={W\bibinitperiod},
+           given={Zhang},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=bb0e3f9280dd7571de4145247767b0a9}{%
+           family={Fang},
+           familyi={F\bibinitperiod},
+           given={Rongyao},
+           giveni={R\bibinitperiod}}}%
+        {{hash=656b3ff4b37de857f99ac65a3f95c61b}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Peng},
+           giveni={P\bibinitperiod}}}%
+        {{hash=e6122da5d7059811b25e218007289741}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Kunchang},
+           giveni={K\bibinitperiod}}}%
+        {{hash=c80dbb87ee6058c0b81ab8ee017f1170}{%
+           family={Dai},
+           familyi={D\bibinitperiod},
+           given={Jifeng},
+           giveni={J\bibinitperiod}}}%
+        {{hash=2addc56ce0ea3a8fc05ff9b0995f74f4}{%
+           family={Qiao},
+           familyi={Q\bibinitperiod},
+           given={Yu},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=c727733707a60b57a65c544b07a9825e}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Hongsheng},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{6835acf49d3bb00ae2177dced5e61c7b}
+      \strng{fullhash}{9fdedac1d5f6e95d34f028cc04eeeef6}
+      \strng{bibnamehash}{6835acf49d3bb00ae2177dced5e61c7b}
+      \strng{authorbibnamehash}{6835acf49d3bb00ae2177dced5e61c7b}
+      \strng{authornamehash}{6835acf49d3bb00ae2177dced5e61c7b}
+      \strng{authorfullhash}{9fdedac1d5f6e95d34f028cc04eeeef6}
+      \field{sortinit}{Z}
+      \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Contrastive Vision-Language Pre-training, known as CLIP, has provided a new paradigm for learning visual representations using large-scale image-text pairs. It shows impressive performance on downstream tasks by zero-shot knowledge transfer. To further enhance CLIP’s adaption capability, existing methods proposed to fine-tune additional learnable modules, which significantly improves the few-shot performance but introduces extra training time and computational resources. In this paper, we propose a Training-free adaption method for CLIP to conduct few-shot classification, termed as Tip-Adapter, which not only inherits the training-free advantage of zero-shot CLIP but also performs comparably to those training-required approaches. Tip-Adapter constructs the adapter via a key-value cache model from the few-shot training set, and updates the prior knowledge encoded in CLIP by feature retrieval. On top of that, the performance of Tip-Adapter can be further boosted to be state-of-the-art on ImageNet by fine-tuning the cache model for 10× fewer epochs than existing methods, which is both effective and efficient. We conduct extensive experiments of few-shot classification on 11 datasets to demonstrate the superiority of our proposed methods. Code is released at https://github.com/gaopengcuhk/Tip-Adapter.}
+      \field{day}{19}
+      \field{eprintclass}{cs}
+      \field{eprinttype}{arXiv}
+      \field{langid}{english}
+      \field{month}{7}
+      \field{pubstate}{prepublished}
+      \field{shorttitle}{Tip-{{Adapter}}}
+      \field{title}{Tip-{{Adapter}}: {{Training-free Adaption}} of {{CLIP}} for {{Few-shot Classification}}}
+      \field{year}{2022}
+      \field{dateera}{ce}
+      \verb{eprint}
+      \verb 2207.09519
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/DMQTP8PG/Zhang et al. - 2022 - Tip-Adapter Training-free Adaption of CLIP for Fe.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2207.09519
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2207.09519
+      \endverb
+      \keyw{Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Computer Vision and Pattern Recognition}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
