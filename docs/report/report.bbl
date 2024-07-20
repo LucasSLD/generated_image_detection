@@ -374,6 +374,223 @@
       \endverb
       \keyw{Computer Science - Computer Vision and Pattern Recognition}
     \endentry
+    \entry{radfordLearningTransferableVisual2021}{online}{}
+      \name{author}{12}{}{%
+        {{hash=a812c46caad94fc8701be37871f303ba}{%
+           family={Radford},
+           familyi={R\bibinitperiod},
+           given={Alec},
+           giveni={A\bibinitperiod}}}%
+        {{hash=37a96525bc70870f8509160f7eccf4b7}{%
+           family={Kim},
+           familyi={K\bibinitperiod},
+           given={Jong\bibnamedelima Wook},
+           giveni={J\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+        {{hash=4d5d078d439e163a02d9d1ba0002bb12}{%
+           family={Hallacy},
+           familyi={H\bibinitperiod},
+           given={Chris},
+           giveni={C\bibinitperiod}}}%
+        {{hash=82063a12702e7b2c026ae0ff03b8f102}{%
+           family={Ramesh},
+           familyi={R\bibinitperiod},
+           given={Aditya},
+           giveni={A\bibinitperiod}}}%
+        {{hash=e5e3e996c0a95da7e97cae269822bbef}{%
+           family={Goh},
+           familyi={G\bibinitperiod},
+           given={Gabriel},
+           giveni={G\bibinitperiod}}}%
+        {{hash=abe4801e322e893b23785fd6d0800b5c}{%
+           family={Agarwal},
+           familyi={A\bibinitperiod},
+           given={Sandhini},
+           giveni={S\bibinitperiod}}}%
+        {{hash=3c1d9a663596faaf544c1a65aac581be}{%
+           family={Sastry},
+           familyi={S\bibinitperiod},
+           given={Girish},
+           giveni={G\bibinitperiod}}}%
+        {{hash=1e84eff933be9f4887bf369cf181bf12}{%
+           family={Askell},
+           familyi={A\bibinitperiod},
+           given={Amanda},
+           giveni={A\bibinitperiod}}}%
+        {{hash=2321e04943bcadb0275819652b980521}{%
+           family={Mishkin},
+           familyi={M\bibinitperiod},
+           given={Pamela},
+           giveni={P\bibinitperiod}}}%
+        {{hash=1480c861b1a73e1d1de1b227e985b179}{%
+           family={Clark},
+           familyi={C\bibinitperiod},
+           given={Jack},
+           giveni={J\bibinitperiod}}}%
+        {{hash=c3a5cc5e520e0d1a9f8bbf377c74cd27}{%
+           family={Krueger},
+           familyi={K\bibinitperiod},
+           given={Gretchen},
+           giveni={G\bibinitperiod}}}%
+        {{hash=8d569d1d5b8b5a7836017a98b430f959}{%
+           family={Sutskever},
+           familyi={S\bibinitperiod},
+           given={Ilya},
+           giveni={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{ca3baa5a22057195db1c71be39b4c922}
+      \strng{fullhash}{de02402f48bd17333411ead3b5ca6de9}
+      \strng{bibnamehash}{ca3baa5a22057195db1c71be39b4c922}
+      \strng{authorbibnamehash}{ca3baa5a22057195db1c71be39b4c922}
+      \strng{authornamehash}{ca3baa5a22057195db1c71be39b4c922}
+      \strng{authorfullhash}{de02402f48bd17333411ead3b5ca6de9}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{State-of-the-art computer vision systems are trained to predict a fixed set of predetermined object categories. This restricted form of supervision limits their generality and usability since additional labeled data is needed to specify any other visual concept. Learning directly from raw text about images is a promising alternative which leverages a much broader source of supervision. We demonstrate that the simple pre-training task of predicting which caption goes with which image is an efficient and scalable way to learn SOTA image representations from scratch on a dataset of 400 million (image, text) pairs collected from the internet. After pre-training, natural language is used to reference learned visual concepts (or describe new ones) enabling zero-shot transfer of the model to downstream tasks. We study the performance of this approach by benchmarking on over 30 different existing computer vision datasets, spanning tasks such as OCR, action recognition in videos, geo-localization, and many types of fine-grained object classification. The model transfers non-trivially to most tasks and is often competitive with a fully supervised baseline without the need for any dataset specific training. For instance, we match the accuracy of the original ResNet-50 on ImageNet zero-shot without needing to use any of the 1.28 million training examples it was trained on. We release our code and pre-trained model weights at https://github.com/OpenAI/CLIP.}
+      \field{day}{26}
+      \field{eprintclass}{cs}
+      \field{eprinttype}{arXiv}
+      \field{langid}{english}
+      \field{month}{2}
+      \field{pubstate}{prepublished}
+      \field{title}{Learning {{Transferable Visual Models From Natural Language Supervision}}}
+      \field{year}{2021}
+      \field{dateera}{ce}
+      \verb{eprint}
+      \verb 2103.00020
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/IJGUHHU6/Radford et al. - 2021 - Learning Transferable Visual Models From Natural L.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2103.00020
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2103.00020
+      \endverb
+      \keyw{Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning}
+    \endentry
+    \entry{tariangSyntheticImageVerification2024}{online}{}
+      \name{author}{6}{}{%
+        {{hash=404391d1a430cced7338644f3586fb5d}{%
+           family={Tariang},
+           familyi={T\bibinitperiod},
+           given={Diangarti},
+           giveni={D\bibinitperiod}}}%
+        {{hash=5adf5258b1288682a2c826337584cb8e}{%
+           family={Corvi},
+           familyi={C\bibinitperiod},
+           given={Riccardo},
+           giveni={R\bibinitperiod}}}%
+        {{hash=c1ecf43c4cd245ac59bfa7f790dc5fdf}{%
+           family={Cozzolino},
+           familyi={C\bibinitperiod},
+           given={Davide},
+           giveni={D\bibinitperiod}}}%
+        {{hash=b8a4ccb499371daaf433f3da22955547}{%
+           family={Poggi},
+           familyi={P\bibinitperiod},
+           given={Giovanni},
+           giveni={G\bibinitperiod}}}%
+        {{hash=ad7e8f511476648e47cc1cf2d1e64e17}{%
+           family={Nagano},
+           familyi={N\bibinitperiod},
+           given={Koki},
+           giveni={K\bibinitperiod}}}%
+        {{hash=23f92e2e6ddd37aaf46d9abd37a37fa1}{%
+           family={Verdoliva},
+           familyi={V\bibinitperiod},
+           given={Luisa},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{43ea4d7cbd594ec8a1a2161b85be0c49}
+      \strng{fullhash}{d3c6597f7d825a340b67ce8ba1d19918}
+      \strng{bibnamehash}{43ea4d7cbd594ec8a1a2161b85be0c49}
+      \strng{authorbibnamehash}{43ea4d7cbd594ec8a1a2161b85be0c49}
+      \strng{authornamehash}{43ea4d7cbd594ec8a1a2161b85be0c49}
+      \strng{authorfullhash}{d3c6597f7d825a340b67ce8ba1d19918}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{In this work we present an overview of approaches for the detection and attribution of synthetic images and highlight their strengths and weaknesses. We also point out and discuss hot topics in this field and outline promising directions for future research.}
+      \field{day}{30}
+      \field{eprintclass}{cs}
+      \field{eprinttype}{arXiv}
+      \field{langid}{english}
+      \field{month}{4}
+      \field{pubstate}{prepublished}
+      \field{shorttitle}{Synthetic {{Image Verification}} in the {{Era}} of {{Generative AI}}}
+      \field{title}{Synthetic {{Image Verification}} in the {{Era}} of {{Generative AI}}: {{What Works}} and {{What Isn}}'t {{There Yet}}}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \verb{eprint}
+      \verb 2405.00196
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/XKPLTLR5/Tariang et al. - 2024 - Synthetic Image Verification in the Era of Generat.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2405.00196
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2405.00196
+      \endverb
+      \keyw{Computer Science - Computer Vision and Pattern Recognition}
+    \endentry
+    \entry{tianContrastiveMultiviewCoding2020}{online}{}
+      \name{author}{3}{}{%
+        {{hash=212a623a4a045452d0eac0274782613e}{%
+           family={Tian},
+           familyi={T\bibinitperiod},
+           given={Yonglong},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=6e4c62612fa904e2c1c6c00006ccc142}{%
+           family={Krishnan},
+           familyi={K\bibinitperiod},
+           given={Dilip},
+           giveni={D\bibinitperiod}}}%
+        {{hash=cae9f806bc99a5f19fadea538fc2db04}{%
+           family={Isola},
+           familyi={I\bibinitperiod},
+           given={Phillip},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{3d51b0b28084a328104f9f6791016aab}
+      \strng{fullhash}{3d51b0b28084a328104f9f6791016aab}
+      \strng{bibnamehash}{3d51b0b28084a328104f9f6791016aab}
+      \strng{authorbibnamehash}{3d51b0b28084a328104f9f6791016aab}
+      \strng{authornamehash}{3d51b0b28084a328104f9f6791016aab}
+      \strng{authorfullhash}{3d51b0b28084a328104f9f6791016aab}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Humans view the world through many sensory channels, e.g., the long-wavelength light channel, viewed by the left eye, or the high-frequency vibrations channel, heard by the right ear. Each view is noisy and incomplete, but important factors, such as physics, geometry, and semantics, tend to be shared between all views (e.g., a “dog” can be seen, heard, and felt). We investigate the classic hypothesis that a powerful representation is one that models view-invariant factors. We study this hypothesis under the framework of multiview contrastive learning, where we learn a representation that aims to maximize mutual information between different views of the same scene but is otherwise compact. Our approach scales to any number of views, and is viewagnostic. We analyze key properties of the approach that make it work, finding that the contrastive loss outperforms a popular alternative based on cross-view prediction, and that the more views we learn from, the better the resulting representation captures underlying scene semantics. Our approach achieves state-of-the-art results on image and video unsupervised learning benchmarks. Code is released at: http://github.com/HobbitLong/CMC/.}
+      \field{day}{18}
+      \field{eprintclass}{cs}
+      \field{eprinttype}{arXiv}
+      \field{langid}{english}
+      \field{month}{12}
+      \field{pubstate}{prepublished}
+      \field{title}{Contrastive {{Multiview Coding}}}
+      \field{year}{2020}
+      \field{dateera}{ce}
+      \verb{eprint}
+      \verb 1906.05849
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/VG3N9943/Tian et al. - 2020 - Contrastive Multiview Coding.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/1906.05849
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/1906.05849
+      \endverb
+      \keyw{Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning}
+    \endentry
     \entry{zhangTipAdapterTrainingfreeAdaption2022}{online}{}
       \name{author}{8}{}{%
         {{hash=d6ca1cfc0836fd55195a73f2e243ab60}{%
