@@ -19,6 +19,49 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global}
+    \entry{bammeySynthbusterDetectionDiffusion2024}{article}{}
+      \name{author}{1}{}{%
+        {{hash=ec84deb353257eefb1b803ecb2fef653}{%
+           family={Bammey},
+           familyi={B\bibinitperiod},
+           given={Quentin},
+           giveni={Q\bibinitperiod}}}%
+      }
+      \strng{namehash}{ec84deb353257eefb1b803ecb2fef653}
+      \strng{fullhash}{ec84deb353257eefb1b803ecb2fef653}
+      \strng{bibnamehash}{ec84deb353257eefb1b803ecb2fef653}
+      \strng{authorbibnamehash}{ec84deb353257eefb1b803ecb2fef653}
+      \strng{authornamehash}{ec84deb353257eefb1b803ecb2fef653}
+      \strng{authorfullhash}{ec84deb353257eefb1b803ecb2fef653}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Synthetically-generated images are getting increasingly popular. Diffusion models have advanced to the stage where even non-experts can generate photo-realistic images from a simple text prompt. They expand creative horizons but also open a Pandora's box of potential disinformation risks. In this context, the present corpus of synthetic image detection techniques, primarily focusing on older generative models like Generative Adversarial Networks, finds itself ill-equipped to deal with this emerging trend. Recognizing this challenge, we introduce a method specifically designed to detect synthetic images produced by diffusion models. Our approach capitalizes on the inherent frequency artefacts left behind during the diffusion process. Spectral analysis is used to highlight the artefacts in the Fourier transform of a residual image, which are used to distinguish real from fake images. The proposed method can detect diffusion-model-generated images even under mild jpeg compression, and generalizes relatively well to unknown models. By pioneering this novel approach, we aim to fortify forensic methodologies and ignite further research into the detection of AI-generated images.}
+      \field{eventtitle}{{{IEEE Open Journal}} of {{Signal Processing}}}
+      \field{issn}{2644-1322}
+      \field{journaltitle}{IEEE Open Journal of Signal Processing}
+      \field{shorttitle}{Synthbuster}
+      \field{title}{Synthbuster: {{Towards Detection}} of {{Diffusion Model Generated Images}}}
+      \field{volume}{5}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{pages}{1\bibrangedash 9}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1109/OJSP.2023.3337714
+      \endverb
+      \verb{file}
+      \verb /home/lucas/Zotero/storage/C6IWUUPC/Bammey - 2024 - Synthbuster Towards Detection of Diffusion Model .pdf;/home/lucas/Zotero/storage/5ZRJC3ZX/10334046.html
+      \endverb
+      \verb{urlraw}
+      \verb https://ieeexplore.ieee.org/document/10334046/?arnumber=10334046
+      \endverb
+      \verb{url}
+      \verb https://ieeexplore.ieee.org/document/10334046/?arnumber=10334046
+      \endverb
+      \keyw{Computational modeling,Computer architecture,Databases,Diffusion models,Image coding,image forensics,Image synthesis,media forensics,multimedia forensics,spectral analysis,synthetic image detection,Training,Transform coding}
+    \endentry
     \entry{cozzolinoRaisingBarAIgenerated2024}{online}{}
       \name{author}{5}{}{%
         {{hash=c1ecf43c4cd245ac59bfa7f790dc5fdf}{%

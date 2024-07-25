@@ -12,7 +12,7 @@
 \usepackage{biblatex}
 \usepackage{geometry}
 \usepackage{todonotes}
-
+\usepackage{multirow}
 
 \addbibresource{_report.bib}
 \geometry{left=2.54cm,right=2.54cm}
@@ -83,11 +83,131 @@ CLIP (Contrastive Language-Image Pretraining) is a neural networked introduced b
     \caption{Figure from \autocite*{radfordLearningTransferableVisual2021}. Images and text are embedded in a latent space, the cosine similarity is then computed on pairs of texts and images.}
 \end{figure}
 
-
 \section{Contributions and associated results}
+The first step of building our CLIP detector was to start with something simple. Three ingredients were needed:
+\begin{enumerate}
+    \item A CLIP model
+    \item A dataset with real and generated images
+    \item A support vector machine to perform the classification
+\end{enumerate}
+
+\subsection{Implementation of a first pipeline toward a CLIP detector}
+The CLIP model was obtained through the open-clip library. The weights are loaded from HuggingFace. As a first dataset, we chose ELSA\_D3. This dataset contains 2.31 million quintuples of images. Each quintuples contains one real image and four images generated from a description of the real image with four models of stable diffusion. The dataset being too big for our need and for the available storage space, we only used a small subpart of it. To build our first dataset, we used the datasets library from HuggingFace. We streamed the ELSA\_D3 dataset from HuggingFace and downloaded 10 000 samples from it. At first, we only downloaded pairs of one real image and one generated image from one generator only. Later, we took pairs of one real image and one generated image from a randomly selected generator among the four availables in ELSA\_D3. ELSA\_D3 only contains URLs to the images to download and not the images themselves. Thus, many URLs were dead links. So the code used to download the images had to take into account the possible errors that could occur such as invalid URLs or connection timeout. 
+
+\begin{figure}[H]
+    \includegraphics*[width=\textwidth]{img/ELSA.png}
+    \caption{An example from ELSA\_D3}
+\end{figure}
+
+At first the dataset we created contained the images themselves and every time we wanted to train the SVM\footnote{Support Vector Machine} we had to apply the preprocessing to the images before feeding them to the CLIP model to obtain their embedding. This process being time consuming, we decided to store the features in the datasets instead of the images which lead to significant time savings. The whole process to obtain a classifier was the following :
+\begin{itemize}
+    \item Load the train/test splits of images
+    \item Appply CLIP's preprocessing to all images
+    \item Feed the images to CLIP's image encoder
+    \item Train an SVM on the CLIP features of the images
+    \item Test the SVM
+\end{itemize}
+
 \subsection{Impact of JPEG compression}
+At first, the SVM was trained on a mix of jpeg and png images. As the sample of images given for the challenge were all jpeg, we decided to convert all images to jpeg. We created datasets for three different quality factors: 40, 65 and 90. These quality factors were chosen based on the early investigations performed on the sample images provided by AID. JPEG compression leads to loss information on the images. Thus we expect that a detector trained on images with high quality factors might perform poorly on  images that are compressed with a low quality factor. 
+\begin{figure}[H]
+    \includegraphics*[width=\textwidth]{img/jpeg.png}
+    \vspace*{-.8cm}
+    \caption{Visual impact of JPEG compression}
+\end{figure}
+
+To observe the impact of the quality factor on the performances of the detector, we created three datasets, one per quality factor. These datasets are then divided in train and test splits. For each quality factor, we trained the model on the corresponding dataset and tested it ont the 3 test sets. Each dataset contains 10000 elements. We obtain the following results:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    & \multicolumn{4}{c|}{Test} \\
+    \cline{2-5}
+     & quality & 40 & 65 & 90 \\
+    \hline
+    \multirow{3}{*}{Train} & 40 & 0.9813 & 0.9730 & 0.9797 \\
+     \cline{2-5}
+     & 65 & 0.9450 & 0.9825 & 0.9830 \\
+     \cline{2-5}
+     & 90 & 0.7744 & 0.8581 & 0.9925 \\
+    \hline
+    \end{tabular}
+    \caption{Accuracy of binary classification for pairs of train/test different quality factors}
+    \label{table:jpeg}
+\end{table}
+
+As we can obeserve on \autoref*{table:jpeg}, the quality at which images where compressed has an important impact on the average acuracy for binary classification. Looking at the row for quality 40, the accuracy only decrease by a small amount when the testing is perform on images with higher quality factor whereas the acuracy decrease by a significative amount when the data used for training as a high quality factor of 90 and is tested on images with lower quality factor. This result highlight the necessity to add jpeg compression at low quality factor in the training data to obtain better performances.
+
 \subsection{Adding diversity to the data}
-\subsection{Bigger datasets and neural network}
+We saw in the previous section that our detector as good accuracy when trained on a small quality factor ans tested on other dataset with equal or higher quality factors. But these tests do not give information about the generalization capabilities of our detector. We need to experiment and observe how the SVM classifier performed on images generated by models that are not in the training data. To do so, we used the Synthbuster dataset that was introduced in \autocite{bammeySynthbusterDetectionDiffusion2024}. This datasets contained images generated by 9 different models:
+\begin{itemize}
+    \item DALL-E 2
+    \item DALL-E 3
+    \item Adobe Firefly
+    \item Midjourney v5
+    \item Stable Diffusion 1.3
+    \item Stable Diffusion 1.4
+    \item Stable Diffusion 2
+    \item Stable Diffusion XL
+    \item Glide
+\end{itemize}
+
+For each generator, 1000 images were generated. This dataset contained only generated images. For testing, we need both real and generated images. Thus we added 9000 images from ELSA\_D3 that were not used in the previous datasets we created.
+After training on 10 000 images from ELSA\_D3 with quality factor 40 and testing on synthbuster we obtained an accuracy of 0.64. Our detector was not generalizing well. Two ideas were proposed to improve detector's performances:
+\begin{itemize}
+    \item Train a multi-class classifier and use it as a binary classifier
+    \item Add more diversity in the training data in terms of generators.
+\end{itemize}
+
+Implementing the multi-class classifier was simple for the SVM as we just replaced binary labels with class labels and replaced the LinearSVC from sklearn with OneVsOneClassifier. We then trained and tested on Synthbuster and plotted the confusion matrix to see if our classifier could differentiate the images from different generators.
+
+\begin{figure}[H]
+    \includegraphics*[width=\textwidth]{img/confusion.png}
+    \caption{Confusion matrix for a SVM multiclass-classifier trained and tested on synthbuster.}
+\end{figure}
+
+The SVM is able to differentiate pretty well generators on which it has been trained on. It made some mistakes between two versions of stable diffusion but this might be because architectures of both models are similar. This result was a first look at multiclass classification performances but test on out-of-distribution data would be required to see the real performances of our detector.
+
+\subsection{Neural network and bigger datasets}
+Up until synthbuster, I was gathering dataset by myself over internet. Then, the team decided to share datasets to be more efficient. Therefore, new datasets were added under a common folder on epeautre, the remote machine on which our code was running and our data was stored. The AID dataset was created. This dataset contained 17 generators with 2000 images per generator and 165000 real images from Flickr. In my case I only took a 1000 images per generators and 17000 real images.\\
+
+Besides the AID dataset we used another dateset that we named AID\_TEST which was used to test the model we trained on AID. This dataset contained 32 generators with 1500 images generated for each of them. In addition to that, the dataset contained 40 000 real images. Training and testing a multiclassifier on datasets thay contains the same classes is simple but what about datasets with classes that do not match? We decided to group generators in families. For instance, all generators that are different versions of Stable Diffusion are grouped together and mapped to the same integer. Instead of predicting the class of specific genertor, our model output the class of a family of generators. To implement thhis, we created three maps:
+\begin{itemize}
+    \item GEN\_TO\_GEN which maps a string representing a specific generator to its family of generators which is another string,
+    \item GEN\_TO\_INT which maps a generator family to an integer
+    \item INT\_TO\_GEN which maps an integer to the family of generators
+\end{itemize}
+\begin{figure}[H]
+    \includegraphics*[width=\textwidth]{img/maps.png}
+    \caption{The mapping between generators and integers}
+\end{figure}
+
+As a first experiment on this dataset, we decided to compare accuracy of SVM and neural network for classification. We built a simple 2 layer fully connected network with 18 outputs (17 outputs for generators and one for real images). Since we implemented a neural network with Pytorch, we decided to take the opportunity to replace HuggingFace's datasets library with Pytorch's Dataset class. Indeed, working with HuggingFace's library has proven to be unpractical for our work and slowed down our iterative process since we were creating many variations of datasets. On the other hand, Pytorch's Dataset class was easy to work with and made the code base easier to navigate and understand as the whole code for the datasets was now in a single file. Once our Dataset class for the AID dataset was implemented, we trained our SVM and our neural network on 80\% of the 34000 data points of AID and tested on the remaining 20\%. We tested for both binary (real or generated) and mutli-class (18 classes) classification.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Model & Binary classification accuracy & Multi-class classification Accuracy\\
+        \hline
+        SVM & 0.970 & 0.873\\
+        \hline
+        Neural network & \textbf{0.974} & \textbf{0.878}\\
+        \hline
+    \end{tabular}
+    \caption{Comparison between SVM and neural network for accuracy in classification task.}
+    \label{table:svmVsNN}
+\end{table}
+
+The neural network has slightly better performances and the developpment of tools is easier with it since we can centralize all the logic in a single class. Hence, we switched from a SVM to a neural network for the classification.\\
+
+
+% issue with our mutliclass approach -> mapping to new generators require training from scratch every time -> weird workflow
+
+%OOD
+
+%repetitivity in the training data -> blacklist
+
 \subsection{Pair training}
 \subsection{Filling the holes with fine tuning}
 
@@ -105,6 +225,7 @@ CLIP (Contrastive Language-Image Pretraining) is a neural networked introduced b
 \subsection{Understanding CLIP features}
 AID real img are bad crops with poor semantic content so why does CLIP detector performed well ?
 Adversarial attack.
+\todo[inline]{skills : team work, ssh work, autonomy}
 
 \newpage
 \printbibliography
