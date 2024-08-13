@@ -180,11 +180,112 @@
   \end{figure}
 \end{frame}
 
-\subsection{Pair training and fine-tuning}
+\begin{frame}{SVM vs neural network}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|p{.3\textwidth}|p{.3\textwidth}|}
+        \hline
+        Model & Binary classification accuracy & Multi-class classification Accuracy\\
+        \hline
+        SVM & 0.970 & 0.873\\
+        \hline
+        Neural network & \textbf{0.974} & \textbf{0.878}\\
+        \hline
+    \end{tabular}
+    \caption{Comparison between SVM and neural network for accuracy in classification task.}
+    \label{table:svmVsNN}
+  \end{table}
+  
+  \pause
+  \begin{columns}
+    \begin{column}{.4\textwidth}
+      \begin{itemize}
+        \item Code of the detector in a single file
+        \pause
+        \item Use Pytorch's dataset library
+      \end{itemize}
+    \end{column}
+    \pause
+    \begin{column}{.05\textwidth}
+      \Huge
+      $\Rightarrow$
+    \end{column}
 
-\subsection{DoubleCLIP: Another approach to work with pairs}
+    \begin{column}{.4\textwidth}
+      Accelerate development
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Multi-class classifier for binary detection vs binary classifier}
+  The issue: GEN\_TO\_GEN map needs to be updated frequently\\
+  \vspace*{.5cm}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      Binary detector accuracy: \textbf{0.71}\\
+      Multi-class binary accuracy: \textbf{0.73} 
+    \end{column}
+
+    \begin{column}{.05\textwidth}
+      \huge
+      $\Rightarrow$
+    \end{column}
+
+    \begin{column}{.4\textwidth}
+      Drop the multi-class classifier to accelerate development.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Cleaning the data}
+  \centering
+  Repetitivity in the semantic of generated images $\rightarrow$ removed generators with repetitivity.
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=.4\textwidth]{img/birthday1.png}
+    \includegraphics[width=.4\textwidth]{img/birthday2.png}
+    \caption{Example of repetition in the content of images. The images are not the same but their semantic is very similar.}
+    \label{fig:repetition}
+  \end{figure}
+\end{frame}
+
+\subsection{Pair training and fine-tuning}
+\begin{frame}{Pair training and fine-tuning}
+  Pair dataset: 1000 pairs of real and generated images + 1000 generated images from AID and 1000 real images from Flickr.\\
+  test\_meta: Real images from Flickr and generated images from 19 generators.
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        accuracy on OOD before fine-tuning on test\_meta & 0.83 \\
+        \hline
+        accuracy on OOD after fine-tuning on test\_meta & 0.91 \\
+        \hline
+        accuracy on test meta before fine-tuning on test\_meta & 0.79 \\
+        \hline
+        accuracy on test meta after fine-tuning on test\_meta & 0.97 \\
+        \hline
+    \end{tabular}
+    \caption{Accuracy comparison before and after fine-tuning.}
+    \label{tab:fine-tuning}
+\end{table}
+\end{frame}
+
+% \subsection{DoubleCLIP: Another approach to work with pairs}
 
 \subsection{Tip-Adapter}
+\begin{frame}{Tip-Adapter}
+  \begin{figure}
+    \includegraphics[height=.7\textheight]{img/tip_adapter_binary.png}
+  \end{figure}
+  \begin{equation}
+    logits = \alpha\underbrace{\varphi(f_{test}F_{train}^T)L_{train}}_{\text{Few-shot knowledge}} + \underbrace{f_{test}W_c^T}_{\text{prior knowledge of pretrained CLIP}} \nonumber
+  \end{equation}
+\end{frame}
+
+\begin{frame}{Tip-Adapter}
+  to complete
+\end{frame}
 
 \section{Conclusion}
 \end{document}
