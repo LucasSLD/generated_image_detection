@@ -88,7 +88,18 @@
 
 \section{AI image generation}
 \subsection{GAN}
+\begin{frame}{GAN}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{img/GAN.png}
+  \end{figure}
+\end{frame}
+
 \subsection{Diffusion model}
+\begin{frame}{Diffusion model}
+  \begin{figure}
+    \includegraphics[width=.8\textwidth]{img/diffusion.png}
+  \end{figure}
+\end{frame}
 
 \section{AI-generated images detection}
 \subsection{CLIP}
@@ -284,8 +295,77 @@
 \end{frame}
 
 \begin{frame}{Tip-Adapter}
-  to complete
+    \begin{table}[H]
+      \centering
+      \begin{tabular}{|c|c|c|}
+      \hline
+      \textbf{Cache Size} & \textbf{Accuracy on TaskA} & \textbf{Accuracy on test\_meta} \\ \hline
+      2    & 0.68 & 0.65 \\ \hline
+      4    & 0.69 & 0.71 \\ \hline
+      6    & 0.70 & 0.74 \\ \hline
+      8    & 0.75 & 0.74 \\ \hline
+      16   & 0.72 & 0.77 \\ \hline
+      32   & 0.69 & 0.75 \\ \hline
+      64   & 0.60 & 0.71 \\ \hline
+      128  & 0.70 & 0.76 \\ \hline
+      200  & 0.68 & 0.76 \\ \hline
+      1000 & 0.69 & 0.75 \\ \hline
+      2000 & 0.68 & 0.75 \\ \hline
+      \end{tabular}
+      \label{tab:cache}
+    \end{table}  
+  \end{frame}
+
+  \begin{frame}{Tip-Adapter}
+    \begin{table}[H]
+      \centering
+      \begin{tabular}{|c|c|c|}
+      \hline
+      \textbf{Alpha} & \textbf{Accuracy on TaskA} & \textbf{Accuracy on test\_meta} \\ \hline
+      0 & 0.65 & 0.47 \\ \hline
+      1 & 0.74 & 0.65 \\ \hline
+      2 & 0.75 & 0.71 \\ \hline
+      3 & 0.76 & 0.73 \\ \hline
+      4 & 0.75 & 0.74 \\ \hline
+      5 & 0.75 & 0.74 \\ \hline
+      \end{tabular}
+      \label{tab:alpha}
+    \end{table}  
+\end{frame}
+
+\begin{frame}{Tip-Adapter-F}
+  \centering
+  \begin{figure}
+    \includegraphics[width=.7\textwidth]{img/tip_adapter_f_binary.png}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Tip-Adapter-F}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    \textbf{Number of epochs} & \textbf{Accuracy on taskA} \\ \hline
+    5   & 0.85 \\ \hline
+    10  & 0.86 \\ \hline
+    20  & 0.88 \\ \hline
+    50  & 0.89 \\ \hline
+    100 & 0.90 \\ \hline
+    \end{tabular}
+  \end{table}
 \end{frame}
 
 \section{Conclusion}
+\begin{frame}{Conclusion}
+  \begin{itemize}
+    \pause
+    \item Importance of the diversity of data
+    \pause
+    \item More experiments on Tip-Adapter-F
+    \pause
+    \item Good performances despite poor semantic content in images from AID
+    \pause
+    \item Need to understand CLIP features $\rightarrow$ adversarial attack
+  \end{itemize}
+\end{frame}
 \end{document}
