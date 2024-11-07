@@ -17,7 +17,6 @@
 \addbibresource{_report.bib}
 \geometry{left=2.54cm,right=2.54cm}
 
-
 \title{Internship Report}
 \author{Lucas SALAND}
 \date{\today}
@@ -92,7 +91,7 @@ Diffusion models use a different approach to generate images. During training, a
     \caption{Image from Wikipedia. Denoising process used by Stable Diffusion.}
 \end{figure}
 
-As improvements happen at an impressive rate in the field of generative models, concerns about security issues rose as well. These tools could be used to manipulate information and combined with social media they would be weapon of massive disinformation. As generative models keep improving, we need to develop new tools to detect generated images. But what should we look for in generated images in order to differentiate them from real images? Many approaches were explored in recent years. Let's go over some of them as they are presented in \autocite*{tariangSyntheticImageVerification2024}.
+As improvements happen at an impressive rate in the field of generative models, concerns about security issues rose as well. These tools could be used to manipulate information and combined with social media they would be weapons of massive disinformation. As generative models keep improving, we need to develop new tools to detect generated images. But what should we look for in generated images in order to differentiate them from real images? Many approaches have been explored in recent years. Let's go over some of them as they are presented in \autocite*{tariangSyntheticImageVerification2024}.
 
 \subsection{Detection based on high-level artifacts}
 These methods detect generated images using a similar approach as humans when they differentiate real and generated images. These approaches look at errors such as incorrect perspectives, incoherence in lighting and shadows or asymmetries in faces.
@@ -136,10 +135,10 @@ The CLIP model was obtained through the open-clip library. The weights are loade
     \caption{An example from ELSA\_D3}
 \end{figure}
 
-At first the dataset we created contained the images themselves and every time we wanted to train the SVM\footnote{Support Vector Machine} we had to apply the preprocessing to the images before feeding them to the CLIP model to obtain their embedding. This process being time consuming, we decided to store the features in the datasets instead of the images which lead to significant time savings. The whole process to obtain a classifier was the following :
+At first, the dataset we created contained the images themselves and every time we wanted to train the SVM\footnote{Support Vector Machine} we had to apply the preprocessing to the images before feeding them to the CLIP model to obtain their embedding. This process being time consuming, we decided to store the features in the datasets instead of the images which lead to significant time savings. The whole process to obtain a classifier was the following :
 \begin{itemize}
     \item Load the train/test splits of images
-    \item Appply CLIP's preprocessing to all images
+    \item Apply CLIP's preprocessing to all images
     \item Feed the images to CLIP's image encoder
     \item Train an SVM on the CLIP features of the images
     \item Test the SVM
@@ -297,7 +296,7 @@ The model performed pretty well for binary classification on both AID and AID\_T
 
 % issue with our mutliclass approach -> mapping to new generators require training from scratch every time -> weird workflow
 We faced some issues with multi-class classification as we didn't know which generators would be used for the challenge, we couldn't settle on a fixed list of generators when creating datasets. This lead to some inconsistencies when we were introducing new datasets in our workflow. Indeed, each time a dataset was added with generators that could not be matched to any family in GEN\_TO\_GEN, we had to modify the GEN\_TO\_GEN by adding a new family to it. This implies retraining the model since the number of outputs of the model grows everytime a family is added to GEN\_TO\_GEN. To keep things managable and to have an efficient workflow, we decided to focus on binary classification for the CLIP detector. But before dropping the multi-class classifier we compared the accuracy of a binary classfier to the accuracy of a multi-class classifier used for binary classification\footnote{generated images are mapped to "generated" label while real images are mapped to "real" label}. We trained both the binary and multi-class classifier on AID and tested on AID\_TEST. We obtained the following results: an accuracy of 0.71 for the binary model and 0.73 for the multi-class classifier used for binary classification. The difference in accuracy is of 2\% between binary model and multi-class model for binary classification. This difference is big enough to be highlighted but not significative enough to keep working with the multi-class classifier. We thus traded off a little bit of performances for a simpler workflow allowing faster iterations in our developpment process which was needed because of the short amount of time available to develop a solution.\\
-While working on the three datasets, we noticed that there was some repetition in the content of the generated images for some generators as we can see on \autoref{fig:repetition}. This repetition in the semantic might not be an issue for residual detectors that looks at low level artifacts. But with CLIP, our goal was to use the content of images as a key information for detection. Having similar generated images in the training data was not desirable. Therefore, we decided to remove the generators that contained many repetitions by creating a generator blacklist for each dataset. AID datset went from 15 generators to 11, 16 generators out of the 32 from AID\_TEST were blacklisted as well. At last, we also removed three generators from OOD: image to image Stable Diffusion 1.5, photoshop generative magnification and photoshop generative fill. OOD didn't contain repetition but the three generators we removed were special cases of image generators as they were only partially modifying the images and not fully generating them. The task of the challenge I was working on would not contain images forged with this kind of tools so we decided to remove them from the testing data.
+While working on the three datasets, we noticed that there was some repetition in the content of the generated images for some generators as we can see on \autoref{fig:repetition}. This repetition in the semantic might not be an issue for residual detectors that looks at low level artifacts. But with CLIP, our goal was to use the content of images as a key information for detection. Having similar generated images in the training data was not desirable. Therefore, we decided to remove the generators that contained many repetitions by creating a generator blacklist for each dataset. AID dataset went from 15 generators to 11, 16 generators out of the 32 from AID\_TEST were blacklisted as well. At last, we also removed three generators from OOD: image to image Stable Diffusion 1.5, photoshop generative magnification and photoshop generative fill. OOD didn't contain repetition but the three generators we removed were special cases of image generators as they were only partially modifying the images and not fully generating them. The task of the challenge I was working on would not contain images forged with this kind of tools so we decided to remove them from the testing data.
 
 \begin{figure}[H]
     \centering

@@ -68,7 +68,3 @@ class TipAdapter(nn.Module):
         with torch.no_grad():
             pred = self.predict(features.to(device))
         return torch.mean(torch.eq(pred,true_labels.to(device)).float()).item()
-
-
-
-        

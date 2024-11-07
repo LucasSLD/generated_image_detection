@@ -86,15 +86,21 @@
   \tableofcontents
 \end{frame}
 
-\section{AI image generation}
-\subsection{GAN}
+\section{Context}
+\subsection{General context}
+\begin{frame}{General context}
+  \begin{itemize}
+    \item CRIStAL $\rightarrow$ SIGMA
+    \item Challenge from Agence de l'innovation de défense (AID)
+  \end{itemize}
+\end{frame}
+\subsection{AI image generation}
 \begin{frame}{GAN}
   \begin{figure}
     \includegraphics[width=\textwidth]{img/GAN.png}
   \end{figure}
 \end{frame}
 
-\subsection{Diffusion model}
 \begin{frame}{Diffusion model}
   \begin{figure}
     \includegraphics[width=.8\textwidth]{img/diffusion.png}
@@ -173,23 +179,23 @@
         \item 1000 images per generator
       \end{itemize}
     \end{column}
-
+    \pause
     \begin{column}{.6\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{img/confusion.png}
-        \caption{Confusion matrix for a SVM multiclass-classifier trained and tested on synth-
+        \caption{SVM trained and tested on synth-
         buster.}
       \end{figure}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Generators diversity and neural network}
-  Multi-class classifier for binary classification:
-  \begin{figure}
-    \includegraphics[width=\textwidth]{img/maps.png}
-  \end{figure}
-\end{frame}
+% \begin{frame}{Generators diversity and neural network}
+%   Multi-class classifier for binary classification:
+%   \begin{figure}
+%     \includegraphics[width=\textwidth]{img/maps.png}
+%   \end{figure}
+% \end{frame}
 
 \begin{frame}{SVM vs neural network}
   \begin{table}[H]
@@ -229,6 +235,9 @@
 \end{frame}
 
 \begin{frame}{Multi-class classifier for binary detection vs binary classifier}
+  \begin{figure}
+    \includegraphics[width=.9\textwidth]{img/maps.png}
+  \end{figure}
   The issue: GEN\_TO\_GEN map needs to be updated frequently\\
   \vspace*{.5cm}
   \begin{columns}
@@ -262,8 +271,12 @@
 
 \subsection{Pair training and fine-tuning}
 \begin{frame}{Pair training and fine-tuning}
-  Pair dataset: 1000 pairs of real and generated images + 1000 generated images from AID and 1000 real images from Flickr.\\
-  test\_meta: Real images from Flickr and generated images from 19 generators.
+  \begin{itemize}
+    \item \textbf{AID dataset}: 11 generators, 1000 images per generator
+    \item \textbf{FlickrAndPairs}: 1000 pairs of real and generated images + 1000 generated images from AID and 1000 real images from Flickr.
+    \item \textbf{test\_meta}: Real images from Flickr and generated images from 19 generators.
+    \item \textbf{OOD}: 7 generators, 100 images per generator
+  \end{itemize}
   \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|}
@@ -271,10 +284,6 @@
         accuracy on OOD before fine-tuning on test\_meta & 0.83 \\
         \hline
         accuracy on OOD after fine-tuning on test\_meta & 0.91 \\
-        \hline
-        accuracy on test meta before fine-tuning on test\_meta & 0.79 \\
-        \hline
-        accuracy on test meta after fine-tuning on test\_meta & 0.97 \\
         \hline
     \end{tabular}
     \caption{Accuracy comparison before and after fine-tuning.}
@@ -367,5 +376,14 @@
     \pause
     \item Need to understand CLIP features $\rightarrow$ adversarial attack
   \end{itemize}
+  \pause
+  \begin{figure}
+    \includegraphics[width=.6\textwidth]{img/roadmap.png}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \centering
+  Questions
 \end{frame}
 \end{document}
